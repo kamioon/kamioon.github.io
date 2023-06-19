@@ -1,7 +1,7 @@
 {
   "name": "kamioon",
   "version": "0.1.0",
-  "homepage": "https://kamioon.github.io/kamioon.github.io",
+  "homepage": "https://kamran.azari.info",
   "private": true,
   "dependencies": {
     "@popperjs/core": "^2.11.8",
@@ -19,7 +19,7 @@
   },
   "scripts": {
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build",
+    "deploy": "gh-pages -b react -d build",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
