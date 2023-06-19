@@ -1,15 +1,15 @@
 import Navbar from "../components/Navbar";
 import {Outlet} from "react-router-dom";
-import Container from "react-bootstrap/Container";
+import {HelmetProvider} from "react-helmet-async";
 
 const Layout = () => {
     return (
-        <>
+        <HelmetProvider>
             <Navbar name="Kamran Azari"/>
-            <Container>
+            <div className='container'>
                 <Outlet/>
-            </Container>
-        </>
+            </div>
+        </HelmetProvider>
     )
 };
 

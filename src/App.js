@@ -8,8 +8,16 @@ import Contact from "./pages/Contact";
 import NoPage from "./pages/NoPage";
 import About from "./pages/About";
 import Tools from "./pages/Tools";
+import TagManager from 'react-gtm-module'
 
+const tagManagerArgs = {
+    gtmId: 'G-PQRJTHGRK3'
+}
+TagManager.initialize(tagManagerArgs)
 export default function App() {
+    window.dataLayer.push({
+        event: 'pageview'
+    });
     return (
         <BrowserRouter>
             <Routes>
