@@ -1,0 +1,19 @@
+{
+  "files": {
+    "main.css": "/static/css/main.c94af498.css",
+    "main.js": "/static/js/main.bf126959.js",
+    "static/js/787.6d95b93d.chunk.js": "/static/js/787.6d95b93d.chunk.js",
+    "static/media/diffrank_com.jpg": "/static/media/diffrank_com.89574b9be64fbbed9558.jpg",
+    "static/media/yaml_ir.jpg": "/static/media/yaml_ir.24de7ae03cc6df1dbba4.jpg",
+    "static/media/about-me.jpeg": "/static/media/about-me.7cb079bc5e83509fbcba.jpeg",
+    "static/media/open_new_tab.svg": "/static/media/open_new_tab.3f29c5a47e8b316fbc9a.svg",
+    "index.html": "/index.html",
+    "main.c94af498.css.map": "/static/css/main.c94af498.css.map",
+    "main.bf126959.js.map": "/static/js/main.bf126959.js.map",
+    "787.6d95b93d.chunk.js.map": "/static/js/787.6d95b93d.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.c94af498.css",
+    "static/js/main.bf126959.js"
+  ]
+}
