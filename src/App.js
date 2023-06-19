@@ -1,6 +1,6 @@
 import ReactDOM from "react-dom/client";
 import './App.css';
-import {BrowserRouter, Route, Routes} from "react-router-dom";
+import {Route, Routes} from "react-router-dom";
 import Layout from "./pages/Layout";
 import Home from "./pages/Home";
 import Blogs from "./pages/Blogs";
@@ -19,18 +19,16 @@ export default function App() {
         event: 'pageview'
     });
     return (
-        <BrowserRouter>
-            <Routes>
-                <Route path="/" element={<Layout/>}>
-                    <Route index element={<Home/>} title='Welcome'/>
-                    <Route path="blogs" element={<Blogs/>} title='Blog Posts'/>
-                    <Route path="contact" element={<Contact/>} title='Contact Me'/>
-                    <Route path="about" element={<About/>} title='About Me'/>
-                    <Route path="tools" element={<Tools/>} title='Tools'/>
-                    <Route path="*" element={<NoPage/>} title='Not found'/>
-                </Route>
-            </Routes>
-        </BrowserRouter>
+        <Routes>
+            <Route path="/" element={<Layout/>}>
+                <Route index element={<Home/>} title='Welcome'/>
+                <Route path="/blogs" element={<Blogs/>} title='Blog Posts'/>
+                <Route path="/contact" element={<Contact/>} title='Contact Me'/>
+                <Route path="/about" element={<About/>} title='About Me'/>
+                <Route path="/tools" element={<Tools/>} title='Tools'/>
+                <Route path="*" element={<NoPage/>} title='Not found'/>
+            </Route>
+        </Routes>
     );
 }
 const root = ReactDOM.createRoot(document.getElementById('root'));
