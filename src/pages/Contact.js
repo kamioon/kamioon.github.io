@@ -20,8 +20,6 @@ class Contact extends React.Component {
                     using social networks like Twitter or Linkedin. </p>
                 <hr/>
                 <ul className="social-networks">
-                    <li className="twitter"><a href="https://twitter.com/kamioon" target="_blank"
-                                               rel="noreferrer">Twitter</a></li>
                     <li className="linkedin"><a href="https://www.linkedin.com/in/kamranazari/" target="_blank"
                                                 rel="noreferrer">Linkedin</a></li>
                     <li className="github"><a href="https://github.com/kamioon" target="_blank"
@@ -29,7 +27,9 @@ class Contact extends React.Component {
                     </li>
                     <li className="stackoverflow"><a href="https://stackoverflow.com/users/7238282/kamran"
                                                      target="_blank"
-                                                     rel="noreferrer">stackoverflow</a></li>
+                                                     rel="noreferrer">Stackoverflow</a></li>
+                    <li className="twitter"><a href="https://x.com/kamioon" target="_blank"
+                                               rel="noreferrer">X</a></li>
                 </ul>
             </div>
         )

@@ -4,6 +4,7 @@ import {Route, Routes} from "react-router-dom";
 import Layout from "./pages/Layout";
 import Home from "./pages/Home";
 import Blogs from "./pages/Blogs";
+import BlogDepartureCountdown from "./pages/BlogDepartureCountdown";
 import Contact from "./pages/Contact";
 import NoPage from "./pages/NoPage";
 import About from "./pages/About";
@@ -23,6 +24,7 @@ export default function App() {
             <Route path="/" element={<Layout/>}>
                 <Route index element={<Home/>} title='Welcome'/>
                 <Route path="/blogs" element={<Blogs/>} title='Blog Posts'/>
+                <Route path="/blogs/departure-countdown" element={<BlogDepartureCountdown/>} title='Never Miss Your Train'/>
                 <Route path="/contact" element={<Contact/>} title='Contact Me'/>
                 <Route path="/about" element={<About/>} title='About Me'/>
                 <Route path="/tools" element={<Tools/>} title='Tools'/>
@@ -31,5 +33,9 @@ export default function App() {
         </Routes>
     );
 }
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(<App/>);
+const rootElement = document.getElementById('root');
+if (rootElement.hasChildNodes()) {
+    ReactDOM.hydrateRoot(rootElement, <App/>);
+} else {
+    ReactDOM.createRoot(rootElement).render(<App/>);
+}
