@@ -1,19 +1,20 @@
 {
   "files": {
-    "main.css": "/static/css/main.c94af498.css",
-    "main.js": "/static/js/main.b3f3694b.js",
-    "static/js/787.6d95b93d.chunk.js": "/static/js/787.6d95b93d.chunk.js",
+    "main.css": "/static/css/main.e67b95ef.css",
+    "main.js": "/static/js/main.0ac9d94f.js",
+    "static/js/453.332698bc.chunk.js": "/static/js/453.332698bc.chunk.js",
+    "static/media/departure_countdown.jpg": "/static/media/departure_countdown.bc2b4f0a53c263ee31ac.jpg",
     "static/media/diffrank_com.jpg": "/static/media/diffrank_com.89574b9be64fbbed9558.jpg",
     "static/media/yaml_ir.jpg": "/static/media/yaml_ir.24de7ae03cc6df1dbba4.jpg",
     "static/media/about-me.jpeg": "/static/media/about-me.7cb079bc5e83509fbcba.jpeg",
     "index.html": "/index.html",
     "static/media/open_new_tab.svg": "/static/media/open_new_tab.3f29c5a47e8b316fbc9a.svg",
-    "main.c94af498.css.map": "/static/css/main.c94af498.css.map",
-    "main.b3f3694b.js.map": "/static/js/main.b3f3694b.js.map",
-    "787.6d95b93d.chunk.js.map": "/static/js/787.6d95b93d.chunk.js.map"
+    "main.e67b95ef.css.map": "/static/css/main.e67b95ef.css.map",
+    "main.0ac9d94f.js.map": "/static/js/main.0ac9d94f.js.map",
+    "453.332698bc.chunk.js.map": "/static/js/453.332698bc.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.c94af498.css",
-    "static/js/main.b3f3694b.js"
+    "static/css/main.e67b95ef.css",
+    "static/js/main.0ac9d94f.js"
   ]
 }
