@@ -1,4 +1,3 @@
-import yamlIr from "../images/yaml_ir.jpg"
 import diffrank from "../images/diffrank_com.jpg"
 import departureCountdown from "../images/departure_countdown.jpg"
 import React from "react";
@@ -10,20 +9,10 @@ class Tools extends React.Component {
             <div id="tools" className="tools">
                 <Seo
                     title="Kamran Azari - Tools"
-                    description="Tools and side projects by Kamran Azari: yaml.ir, a free JSON/YAML converter, and a smart train departure countdown display."
+                    description="Tools and side projects by Kamran Azari, including a smart train departure countdown display."
                     path="/tools"
                 />
                 <h1>Tools</h1>
-                <div className="row">
-                    <div className="col-5">
-                        <h4>JSON to YAML/YAML to JSON</h4>
-                        <p>It's a simple online free tool for converting YAML to JSON or JSON to YAML.</p>
-                        <p>visit <a className="target_blank" target="_blank" href="https://yaml.ir" rel="noreferrer">yaml.ir</a></p>
-                    </div>
-                    <div className="col-5">
-                        <img className='img-responsive' src={yamlIr} alt="Yaml.ir"/>
-                    </div>
-                </div>
                 <div className="row">
                     <div className="col-5">
                         <h4>Departure Countdown</h4>
