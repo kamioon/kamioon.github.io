@@ -1,5 +1,5 @@
 import React from "react";
-import {Helmet} from "react-helmet";
+import Seo, {PERSON, SITE_URL} from "../components/Seo";
 import departureCountdownImg from "../images/departure_countdown.jpg";
 
 const pre = {
@@ -77,7 +77,7 @@ const shareBtn = (color) => ({
     textDecoration: 'none',
 });
 
-const POST_URL = 'https://kamran.azari.info/blogs/departure-countdown';
+const POST_URL = `${SITE_URL}/blogs/departure-countdown`;
 const POST_TITLE = 'Building a Smart Train Departure Countdown Display with ESP32';
 
 const YtIcon = () => (
@@ -98,33 +98,27 @@ class BlogDepartureCountdown extends React.Component {
     render() {
         return (
             <div id="blog" className="blog">
-                <Helmet>
-                    <title>Building a Smart Train Departure Countdown Display with ESP32</title>
-                    <meta name="description" content="How I built a wall-mounted MAX7219 LED display on an ESP32-S3 that counts down to when you need to leave home — not when the train departs — using the NS Dutch Railways API, FreeRTOS, and a local web UI." />
-                    <meta name="keywords" content="ESP32, ESP32-S3, IoT, train departure countdown, NS API, MAX7219, dot matrix display, FreeRTOS, smart home, Home Assistant, DIY electronics, PlatformIO, embedded C++"/>
-                    <meta property="og:title" content="Building a Smart Train Departure Countdown Display with ESP32"/>
-                    <meta property="og:description" content="A wall-mounted LED display that counts down to when you need to leave — not when the train departs. Built on ESP32-S3 with FreeRTOS, NS API, and a local web UI."/>
-                    <meta property="og:type" content="article"/>
-                    <meta property="og:url" content="https://kamran.azari.info/blogs/departure-countdown"/>
-                    <meta property="og:image" content="https://kamran.azari.info/departure-countdown-preview.jpg"/>
-                    <meta property="og:image:width" content="1200"/>
-                    <meta property="og:image:height" content="630"/>
-                    <meta name="twitter:card" content="summary_large_image"/>
-                    <meta name="twitter:title" content="Building a Smart Train Departure Countdown Display with ESP32"/>
-                    <meta name="twitter:description" content="A wall-mounted LED display that counts down to when you need to leave — not when the train departs. Built on ESP32-S3 with FreeRTOS and the NS Railways API."/>
-                    <meta name="twitter:image" content="https://kamran.azari.info/departure-countdown-preview.jpg"/>
-                    <script type="application/ld+json">{JSON.stringify({
-                        "@context": "https://schema.org",
+                <Seo
+                    title={POST_TITLE}
+                    description="How I built a wall-mounted MAX7219 LED display on an ESP32-S3 that counts down to when you need to leave home — not when the train departs — using the NS Dutch Railways API, FreeRTOS, and a local web UI."
+                    path="/blogs/departure-countdown"
+                    type="article"
+                    jsonLd={{
                         "@type": "TechArticle",
-                        "headline": "Building a Smart Train Departure Countdown Display with ESP32",
+                        "headline": POST_TITLE,
                         "description": "How I built a wall-mounted MAX7219 LED display on an ESP32-S3 that counts down to when you need to leave home — not when the train departs.",
-                        "author": {"@type": "Person", "name": "Kamran Azari", "url": "https://kamran.azari.info"},
+                        "image": SITE_URL + departureCountdownImg,
+                        "author": PERSON,
                         "datePublished": "2025-05-05",
-                        "url": "https://kamran.azari.info/blogs/departure-countdown",
+                        "dateModified": "2025-05-05",
+                        "mainEntityOfPage": POST_URL,
                         "keywords": "ESP32, IoT, NS API, MAX7219, FreeRTOS, train departure",
                         "about": {"@type": "Thing", "name": "IoT embedded systems"}
-                    })}</script>
-                </Helmet>
+                    }}
+                >
+                    <meta name="keywords" content="ESP32, ESP32-S3, IoT, train departure countdown, NS API, MAX7219, dot matrix display, FreeRTOS, smart home, Home Assistant, DIY electronics, PlatformIO, embedded C++"/>
+                    <meta property="article:published_time" content="2025-05-05"/>
+                </Seo>
 
                 <h1>Building a Smart Train Departure Countdown Display</h1>
                 <p><small>May 5, 2025 &nbsp;·&nbsp; Kamran Azari &nbsp;·&nbsp; <em>ESP32 · FreeRTOS · IoT · C++</em></small></p>

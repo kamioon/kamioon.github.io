@@ -1,17 +1,15 @@
 import React from "react";
-import {Helmet} from "react-helmet";
+import Seo from "../components/Seo";
 
 class Contact extends React.Component {
     render() {
         return (
             <div id="contact" className="contact">
-                <Helmet>
-                    <title>Kamran Azari - Contact Me</title>
-                    <meta
-                        name="description"
-                        content="Find me here"
-                    />;
-                </Helmet>
+                <Seo
+                    title="Kamran Azari - Contact Me"
+                    description="Get in touch with Kamran Azari on LinkedIn, GitHub, Stack Overflow or X."
+                    path="/contact"
+                />
                 <h1>Contact me</h1>
                 <p>
                     I would love to hear from you. Whether you have a question, suggestion, or just want to say hello.

@@ -1,18 +1,18 @@
 import aboutImg from "../images/about-me.jpeg"
 import React from "react";
-import {Helmet} from "react-helmet";
+import Seo, {PERSON, SITE_URL} from "../components/Seo";
 
 class About extends React.Component {
     render() {
         return (
             <div id="about" className="about">
-                <Helmet>
-                    <title>Kamran Azari - About Me</title>
-                    <meta
-                        name="description"
-                        content="About me and my experiences"
-                    />
-                </Helmet>
+                <Seo
+                    title="Kamran Azari - About Me"
+                    description="About Kamran Azari: a software developer in the Netherlands who has been building for the web since 2007, mostly with PHP, Python and Go."
+                    path="/about"
+                    type="profile"
+                    jsonLd={{"@type": "ProfilePage", "mainEntity": {...PERSON, "image": SITE_URL + aboutImg}}}
+                />
                 <h1>About me</h1>
                 <img src={aboutImg} alt="Kamran Azari"/>
                 <p>

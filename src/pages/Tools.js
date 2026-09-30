@@ -2,19 +2,17 @@ import yamlIr from "../images/yaml_ir.jpg"
 import diffrank from "../images/diffrank_com.jpg"
 import departureCountdown from "../images/departure_countdown.jpg"
 import React from "react";
-import {Helmet} from "react-helmet";
+import Seo from "../components/Seo";
 
 class Tools extends React.Component {
     render() {
         return (
             <div id="tools" className="tools">
-                <Helmet>
-                    <title>Kamran Azari - Tools</title>
-                    <meta
-                        name="description"
-                        content="Some online cool tools or project"
-                    />;
-                </Helmet>
+                <Seo
+                    title="Kamran Azari - Tools"
+                    description="Tools and side projects by Kamran Azari: yaml.ir, a free JSON/YAML converter, and a smart train departure countdown display."
+                    path="/tools"
+                />
                 <h1>Tools</h1>
                 <div className="row">
                     <div className="col-5">

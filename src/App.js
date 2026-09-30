@@ -1,4 +1,3 @@
-import ReactDOM from "react-dom/client";
 import './App.css';
 import {Route, Routes} from "react-router-dom";
 import Layout from "./pages/Layout";
@@ -9,16 +8,9 @@ import Contact from "./pages/Contact";
 import NoPage from "./pages/NoPage";
 import About from "./pages/About";
 import Tools from "./pages/Tools";
-import TagManager from 'react-gtm-module'
 
-const tagManagerArgs = {
-    gtmId: 'G-PQRJTHGRK3'
-}
-TagManager.initialize(tagManagerArgs)
+// Rendered in the browser by index.js and at build time by ssr.js, so keep it free of browser-only side effects.
 export default function App() {
-    window.dataLayer.push({
-        event: 'pageview'
-    });
     return (
         <Routes>
             <Route path="/" element={<Layout/>}>
@@ -32,10 +24,4 @@ export default function App() {
             </Route>
         </Routes>
     );
-}
-const rootElement = document.getElementById('root');
-if (rootElement.hasChildNodes()) {
-    ReactDOM.hydrateRoot(rootElement, <App/>);
-} else {
-    ReactDOM.createRoot(rootElement).render(<App/>);
 }

@@ -1,18 +1,16 @@
 import React from "react";
-import {Helmet} from "react-helmet";
+import Seo from "../components/Seo";
 import {Link} from "react-router-dom";
 
 class Blogs extends React.Component {
     render() {
         return (
             <div id="blog" className="blog">
-                <Helmet>
-                    <title>Kamran Azari - Blog</title>
-                    <meta
-                        name="description"
-                        content="Blog posts by Kamran Azari on software, hardware, and side projects."
-                    />
-                </Helmet>
+                <Seo
+                    title="Kamran Azari - Blog"
+                    description="Blog posts by Kamran Azari on software, hardware, and side projects."
+                    path="/blogs"
+                />
                 <h1>Blog</h1>
                 <p>
                     <Link to="/blogs/departure-countdown">Building a Smart Train Departure Countdown Display with ESP32</Link>
