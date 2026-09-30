@@ -1,20 +1,19 @@
 {
   "files": {
     "main.css": "/static/css/main.e67b95ef.css",
-    "main.js": "/static/js/main.0ac9d94f.js",
+    "main.js": "/static/js/main.459f21ed.js",
     "static/js/453.332698bc.chunk.js": "/static/js/453.332698bc.chunk.js",
-    "static/media/departure_countdown.jpg": "/static/media/departure_countdown.bc2b4f0a53c263ee31ac.jpg",
-    "static/media/diffrank_com.jpg": "/static/media/diffrank_com.89574b9be64fbbed9558.jpg",
-    "static/media/yaml_ir.jpg": "/static/media/yaml_ir.24de7ae03cc6df1dbba4.jpg",
-    "static/media/about-me.jpeg": "/static/media/about-me.7cb079bc5e83509fbcba.jpeg",
+    "static/media/departure_countdown.jpg": "/static/media/departure_countdown.19dd0759da5e8aad4f55.jpg",
+    "static/media/diffrank_com.jpg": "/static/media/diffrank_com.6e50223d46ddae8aafd2.jpg",
+    "static/media/about-me.jpeg": "/static/media/about-me.fa5bc5b47b9ff4b8c480.jpeg",
     "index.html": "/index.html",
     "static/media/open_new_tab.svg": "/static/media/open_new_tab.3f29c5a47e8b316fbc9a.svg",
     "main.e67b95ef.css.map": "/static/css/main.e67b95ef.css.map",
-    "main.0ac9d94f.js.map": "/static/js/main.0ac9d94f.js.map",
+    "main.459f21ed.js.map": "/static/js/main.459f21ed.js.map",
     "453.332698bc.chunk.js.map": "/static/js/453.332698bc.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.e67b95ef.css",
-    "static/js/main.0ac9d94f.js"
+    "static/js/main.459f21ed.js"
   ]
 }

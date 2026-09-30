@@ -1,0 +1,14 @@
+# Kamran Azari
+
+> Personal website and blog of Kamran Azari, a software developer based in the Netherlands, writing about software, IoT and side projects.
+
+## Blog posts
+
+- [Building a Smart Train Departure Countdown Display with ESP32](https://kamran.azari.info/blogs/departure-countdown): How I built a wall-mounted MAX7219 LED display on an ESP32-S3 that counts down to when you need to leave home — not when the train departs — using the NS Dutch Railways API, FreeRTOS, and a local web UI.
+
+## Pages
+
+- [Kamran Azari - Blog](https://kamran.azari.info/blogs): Blog posts by Kamran Azari on software, hardware, and side projects.
+- [Kamran Azari - Tools](https://kamran.azari.info/tools): Tools and side projects by Kamran Azari, including a smart train departure countdown display.
+- [Kamran Azari - Contact Me](https://kamran.azari.info/contact): Get in touch with Kamran Azari on LinkedIn, GitHub, Stack Overflow or X.
+- [Kamran Azari - About Me](https://kamran.azari.info/about): About Kamran Azari: a software developer in the Netherlands who has been building for the web since 2007, mostly with PHP, Python and Go.
