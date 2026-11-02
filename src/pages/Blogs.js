@@ -22,7 +22,7 @@ class Blogs extends React.Component {
                 <p className="post-item">
                     <Link to="/blogs/departure-countdown">Building a Smart Train Departure Countdown Display with ESP32</Link>
                     <br/>
-                    <small>May 5, 2025</small>
+                    <small>May 5, 2026</small>
                     <br/>
                     A wall-mounted MAX7219 dot-matrix display on an ESP32-S3 that counts down to when you need to leave — not when the train departs.
                 </p>

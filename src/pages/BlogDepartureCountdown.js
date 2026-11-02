@@ -110,19 +110,19 @@ class BlogDepartureCountdown extends React.Component {
                         "description": "How I built a wall-mounted MAX7219 LED display on an ESP32-S3 that counts down to when you need to leave home — not when the train departs.",
                         "image": SITE_URL + departureCountdownImg,
                         "author": PERSON,
-                        "datePublished": "2025-05-05",
-                        "dateModified": "2025-05-05",
+                        "datePublished": "2026-05-05",
+                        "dateModified": "2026-05-05",
                         "mainEntityOfPage": POST_URL,
                         "keywords": "ESP32, IoT, NS API, MAX7219, FreeRTOS, train departure",
                         "about": {"@type": "Thing", "name": "IoT embedded systems"}
                     }}
                 >
                     <meta name="keywords" content="ESP32, ESP32-S3, IoT, train departure countdown, NS API, MAX7219, dot matrix display, FreeRTOS, smart home, Home Assistant, DIY electronics, PlatformIO, embedded C++"/>
-                    <meta property="article:published_time" content="2025-05-05"/>
+                    <meta property="article:published_time" content="2026-05-05"/>
                 </Seo>
 
                 <h1>Building a Smart Train Departure Countdown Display</h1>
-                <p><small>May 5, 2025 &nbsp;·&nbsp; Kamran Azari &nbsp;·&nbsp; <em>ESP32 · FreeRTOS · IoT · C++</em></small></p>
+                <p><small>May 5, 2026 &nbsp;·&nbsp; Kamran Azari &nbsp;·&nbsp; <em>ESP32 · FreeRTOS · IoT · C++</em></small></p>
 
                 <div style={{display: 'flex', flexWrap: 'wrap', gap: '0.5em', alignItems: 'center', margin: '0.5em 0 1.2em'}}>
                     <span style={{fontSize: '0.8em', color: '#666'}}>Share:</span>
