@@ -4,6 +4,7 @@
 
 ## Blog posts
 
+- [Departure Timer: a Chrome Extension That Tells You When to Leave for Your Train](https://kamran.azari.info/blogs/departure-timer): Departure Timer is a free, open source Chrome extension for Dutch train commuters. It shows how many minutes are left before you must leave, using the NS API.
 - [Building a Smart Train Departure Countdown Display with ESP32](https://kamran.azari.info/blogs/departure-countdown): How I built a wall-mounted MAX7219 LED display on an ESP32-S3 that counts down to when you need to leave home — not when the train departs — using the NS Dutch Railways API, FreeRTOS, and a local web UI.
 
 ## Pages
