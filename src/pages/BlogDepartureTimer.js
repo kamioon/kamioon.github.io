@@ -45,7 +45,7 @@ const shot = {
     border: '1px solid rgba(0,0,0,0.12)',
 };
 
-const caption = {fontSize: '0.82em', color: '#555', margin: '0.4em 0 1.2em'};
+const caption = {fontSize: '0.82em', color: '#555', margin: '0.4em 0 1.2em', textAlign: 'center'};
 
 const ghCard = {
     display: 'flex',

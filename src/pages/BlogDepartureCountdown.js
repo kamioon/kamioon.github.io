@@ -1,4 +1,5 @@
 import React from "react";
+import {Link} from "react-router-dom";
 import Seo, {PERSON, SITE_URL} from "../components/Seo";
 import departureCountdownImg from "../images/departure_countdown.jpg";
 
@@ -186,6 +187,11 @@ class BlogDepartureCountdown extends React.Component {
                     This device answers exactly that. The display shows a live <span style={ic}>MM:SS</span> countdown
                     to the moment you need to walk out the door — already accounting for the distance to the station.
                     When it hits zero, you leave. No mental math required.
+                </p>
+                <p>
+                    This isn't my first version of the idea. Before this display I made a Chrome extension that shows
+                    the same thing on the browser toolbar:{' '}
+                    <Link to="/blogs/departure-timer">Departure Timer</Link>.
                 </p>
 
                 <h2>Hardware Overview</h2>
@@ -602,6 +608,10 @@ pio test -e native -f test_countdown_calc  # single suite`}</pre>
                     The other lesson: power supply matters more than you expect. Two MAX7219 modules at full
                     brightness pull close to 2 A. Without the 1000 µF cap on the 5V rail, the ESP32 would
                     reset when the display lit up. A €0.10 capacitor in the right place saved hours of debugging.
+                </p>
+                <p>
+                    No hardware needed? The Chrome extension does the same in your browser. It's
+                    called <Link to="/blogs/departure-timer">Departure Timer</Link>, and it's public and open source.
                 </p>
 
                 <a href="https://github.com/kamioon/departure-countdown" target="_blank" rel="noreferrer" style={ghCard}>

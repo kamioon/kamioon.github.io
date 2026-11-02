@@ -12,14 +12,14 @@ class Blogs extends React.Component {
                     path="/blogs"
                 />
                 <h1>Blog</h1>
-                <p>
+                <p className="post-item">
                     <Link to="/blogs/departure-timer">Departure Timer: a Chrome Extension That Tells You When to Leave for Your Train</Link>
                     <br/>
                     <small>November 2, 2026</small>
                     <br/>
                     A free, open source Chrome extension that shows the minutes left before you must leave for your next NS train.
                 </p>
-                <p>
+                <p className="post-item">
                     <Link to="/blogs/departure-countdown">Building a Smart Train Departure Countdown Display with ESP32</Link>
                     <br/>
                     <small>May 5, 2025</small>
