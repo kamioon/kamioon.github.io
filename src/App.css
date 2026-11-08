@@ -237,6 +237,182 @@ a.target_blank:hover {
     color: #555;
 }
 
+/* Page frame: at least one screen tall so the footer sits at the very bottom of short pages. */
+.page {
+    position: relative;
+    display: flow-root; /* keep the nav's top margin inside, as it was collapsing into body before */
+    box-sizing: border-box;
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding-bottom: 56px; /* room for the footer */
+}
+
+/* Footer: a Volvo F12 style truck patrolling a road, see components/Footer.js. */
+.truck-footer {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 56px;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.truck-road {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 10px;
+    border-top: 1px dashed rgba(0, 0, 0, 0.3);
+}
+
+.truck {
+    position: absolute;
+    left: 0;
+    bottom: 11px; /* wheels rest on the road line */
+    width: 100px;
+    height: 40px;
+    will-change: transform;
+    /* It is a button (click to honk); the rest of the footer lets clicks through. */
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    cursor: pointer;
+    pointer-events: auto;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.truck svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+@media only screen and (max-width: 480px) {
+    .truck {
+        width: 80px;
+        height: 32px;
+    }
+}
+
+/* Trailer */
+.truck-box {
+    fill: #f4f4f4;
+}
+
+.truck-ribs {
+    fill: none;
+    stroke: #d6d6d6;
+    stroke-width: 0.5;
+}
+
+.truck-stripe,
+.truck-cab {
+    fill: #c8102f;
+}
+
+/* Chassis and small dark parts */
+.truck-frame,
+.truck-trim {
+    fill: #2a2a2a;
+}
+
+.truck-stack {
+    fill: #bdbdbd;
+}
+
+.truck-tank {
+    fill: #9c9c9c;
+}
+
+.truck-strap {
+    fill: none;
+    stroke: #6b6b6b;
+    stroke-width: 0.6;
+}
+
+/* Cab */
+.truck-arch {
+    fill: #1b1b1b;
+}
+
+.truck-seam {
+    fill: none;
+    stroke: rgba(0, 0, 0, 0.35);
+    stroke-width: 0.6;
+}
+
+.truck-glass {
+    fill: #26323b;
+}
+
+.truck-glint {
+    fill: rgba(255, 255, 255, 0.22);
+}
+
+.truck-light-amber {
+    fill: #ffb300;
+}
+
+.truck-light-red {
+    fill: #ff2d2d;
+}
+
+.truck-headlight {
+    fill: #fff3c4;
+}
+
+/* Wheels */
+.truck-tire {
+    fill: #222;
+}
+
+.truck-tread {
+    fill: none;
+    stroke: #3d3d3d;
+    stroke-width: 0.6;
+}
+
+.truck-rim {
+    fill: #cfcfcf;
+}
+
+.truck-lug,
+.truck-hub {
+    fill: #555;
+}
+
+/* Honk: the headlights and roof lights flash with a glow. */
+@keyframes truck-flash {
+    0%, 100% {
+        stroke-width: 0;
+    }
+    20%, 60% {
+        stroke-width: 2.4;
+    }
+    40%, 80% {
+        stroke-width: 0.6;
+    }
+}
+
+.truck-footer.honking .truck-headlight {
+    stroke: rgba(255, 244, 196, 0.6);
+    animation: truck-flash 0.9s ease-in-out;
+}
+
+.truck-footer.honking .truck-light-amber {
+    stroke: rgba(255, 179, 0, 0.55);
+    animation: truck-flash 0.9s ease-in-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .truck-footer.honking .truck-headlight,
+    .truck-footer.honking .truck-light-amber {
+        animation: none;
+    }
+}
+
 @media only screen and (max-width: 768px) {
     .container {
         max-width: 100%;
