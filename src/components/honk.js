@@ -1,12 +1,12 @@
-// A synthesised truck air horn (Web Audio), so there is no audio file to download.
-// Only touches `window` when honk() is called (from a click), so it is safe to import during prerendering.
+// A truck air horn made with Web Audio, so there is no audio file to download.
+// It only touches `window` inside honk(), so importing it during prerendering is fine.
 
-// Three "trumpets" tuned to a deep major chord (Bb3, D4, F4), like the horns on a heavy truck.
+// Three trumpets in a deep major chord (Bb3, D4, F4)
 const NOTES = [233.08, 293.66, 349.23];
 const PEAK = 0.35; // the initial blast
 const SUSTAIN = 0.25;
 
-// Soft clipping adds the brassy odd harmonics of a real horn.
+// soft clipping adds the brassy harmonics
 const SATURATION = (() => {
     const curve = new Float32Array(512);
     for (let i = 0; i < curve.length; i++) curve[i] = Math.tanh(3 * ((i / (curve.length - 1)) * 2 - 1));
@@ -14,7 +14,7 @@ const SATURATION = (() => {
 })();
 
 let context = null;
-let current = null; // the horn that is sounding right now, if any
+let current = null; // the horn that is sounding
 let silence = null; // iOS fallback, see keepAudible()
 let silenceTimer = 0;
 
@@ -23,7 +23,7 @@ function audioContext() {
     if (!Context) return null;
     if (!context) {
         context = new Context();
-        // Older iOS only unlocks audio once something has been started inside the tap.
+        // older iOS only unlocks audio once something has started inside the tap
         const unlock = context.createBufferSource();
         unlock.buffer = context.createBuffer(1, 1, context.sampleRate);
         unlock.connect(context.destination);
@@ -32,7 +32,7 @@ function audioContext() {
     return context;
 }
 
-// A tiny silent clip, so no audio file is needed. Looping, it keeps an iOS audio session open.
+// A silent clip that keeps an iOS audio session open while it loops
 function silentClip() {
     const rate = 8000;
     const samples = 800;
@@ -56,8 +56,7 @@ function silentClip() {
     return audio;
 }
 
-// iPhones keep Web Audio on a session that the ringer (silent) switch mutes, which is why a horn that
-// works on desktop can be silent there. Moving the page to the "playback" session makes it audible.
+// iPhones mute Web Audio with the silent switch. The "playback" audio session is not muted.
 function keepAudible(seconds) {
     try {
         if (navigator.audioSession) {
@@ -67,13 +66,13 @@ function keepAudible(seconds) {
         const ios = /iP(hone|ad|od)/.test(navigator.userAgent) ||
             (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
         if (!ios) return;
-        // Older iOS: a media element that is playing puts the page on the same session.
+        // older iOS: a playing media element does the same
         if (!silence) silence = silentClip();
         silence.play().catch(() => {});
         clearTimeout(silenceTimer);
         silenceTimer = setTimeout(() => silence.pause(), (seconds + 1) * 1000);
     } catch (error) {
-        // Not worth breaking the honk over.
+        // the audio session is optional
     }
 }
 
@@ -84,7 +83,7 @@ function noiseBuffer(ctx, seconds) {
     return buffer;
 }
 
-// Call from a click or tap: browsers only start audio from a user gesture.
+// Call from a click or tap, browsers only start audio from a user gesture.
 export function honk(seconds = 0.9) {
     const ctx = audioContext();
     if (!ctx) return;
@@ -92,24 +91,23 @@ export function honk(seconds = 0.9) {
     if (ctx.state === 'running') {
         sound(ctx, seconds);
     } else {
-        // Scheduling on a suspended context (the first tap, or after an iOS interruption) can play nothing,
-        // so start the horn once it is actually running.
+        // a suspended context (first tap, or after an iOS interruption) can play nothing, so wait for it
         ctx.resume().then(() => sound(ctx, seconds), () => {});
     }
 }
 
 function sound(ctx, seconds) {
-    if (current) current.cut(); // pressing again restarts the horn
+    if (current) current.cut(); // pressing again restarts it
 
     const start = ctx.currentTime + 0.02;
     const end = start + seconds;
 
-    // Trumpets -> saturation -> brassy low-pass -> horn "bell" resonance -> envelope -> speakers.
+    // trumpets -> saturation -> low-pass -> bell resonance -> envelope -> speakers
     const envelope = ctx.createGain();
     envelope.gain.setValueAtTime(0.0001, start);
-    envelope.gain.linearRampToValueAtTime(PEAK, start + 0.035); // the blast
-    envelope.gain.setTargetAtTime(SUSTAIN, start + 0.045, 0.08); // settles
-    envelope.gain.setTargetAtTime(0.0001, end, 0.045); // release
+    envelope.gain.linearRampToValueAtTime(PEAK, start + 0.035);
+    envelope.gain.setTargetAtTime(SUSTAIN, start + 0.045, 0.08);
+    envelope.gain.setTargetAtTime(0.0001, end, 0.045);
     envelope.connect(ctx.destination);
 
     const bell = ctx.createBiquadFilter();
@@ -123,7 +121,7 @@ function sound(ctx, seconds) {
     brass.type = 'lowpass';
     brass.Q.value = 0.9;
     brass.frequency.setValueAtTime(500, start);
-    brass.frequency.exponentialRampToValueAtTime(2800, start + 0.09); // opens up as the air hits
+    brass.frequency.exponentialRampToValueAtTime(2800, start + 0.09);
     brass.connect(bell);
 
     const shaper = ctx.createWaveShaper();
@@ -137,14 +135,14 @@ function sound(ctx, seconds) {
 
     const sources = [];
     NOTES.forEach(note => {
-        // Two slightly detuned reeds per trumpet: the beating between them is what makes it sound real.
+        // two slightly detuned reeds per trumpet, the beating sounds real
         [-7, 7].forEach(cents => {
             const osc = ctx.createOscillator();
             osc.type = 'sawtooth';
             osc.detune.value = cents;
-            osc.frequency.setValueAtTime(note * 0.94, start); // the diaphragm snaps up to pitch
+            osc.frequency.setValueAtTime(note * 0.94, start); // snaps up to pitch
             osc.frequency.exponentialRampToValueAtTime(note, start + 0.07);
-            osc.frequency.setTargetAtTime(note * 0.97, end, 0.06); // sags as the air runs out
+            osc.frequency.setTargetAtTime(note * 0.97, end, 0.06); // sags at the end
             osc.connect(mix);
             osc.start(start);
             osc.stop(end + 0.5);
@@ -152,7 +150,7 @@ function sound(ctx, seconds) {
         });
     });
 
-    // A short chuff of air as the horn opens.
+    // a short chuff of air as the horn opens
     const chuff = ctx.createBufferSource();
     chuff.buffer = noiseBuffer(ctx, 0.15);
     const chuffFilter = ctx.createBiquadFilter();

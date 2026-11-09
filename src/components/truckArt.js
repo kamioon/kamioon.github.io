@@ -1,12 +1,14 @@
-// Drawing parts for the road scene on the About page (see RoadTrip.js): a Volvo F12 style tractor, a container
-// chassis and the wheels. All in the truck's own units: a 100 x 40 frame with the road at y = 40 and the cab on the
-// right. (The little footer truck, Truck.js, has its own copy of this art so that it stays exactly as it is.)
+// Parts of the truck drawing, shared by the footer truck (Truck.js) and the road scene (RoadTrip.js).
+// The drawing is 100 x 40 units: road at y = 40, cab on the right.
 
 export const WHEEL_RADIUS = 5;
-export const TRAILER_WHEELS = [9, 21]; // x of the trailer's tandem axle
+export const WHEEL_Y = 35;
+export const TRAILER_WHEELS = [9, 21]; // x of the tandem axle
 export const TRACTOR_WHEELS = [54.5, 86.5]; // x of the drive axle and the steer axle
 
-// Points on a circle for the hand holes and hub nuts (rounded, so server and browser print the same markup).
+export const spin = (cx, angle) => `translate(${cx} ${WHEEL_Y}) rotate(${angle.toFixed(1)})`;
+
+// Rounded, so the server and the browser print the same markup.
 const ring = (count, radius, offset = 0) => Array.from({length: count}, (_, i) => {
     const angle = offset + (i * 2 * Math.PI) / count;
     return [+(radius * Math.cos(angle)).toFixed(2), +(radius * Math.sin(angle)).toFixed(2)];
@@ -14,10 +16,9 @@ const ring = (count, radius, offset = 0) => Array.from({length: count}, (_, i) =
 const HOLES = ring(8, 2.35, Math.PI / 8);
 const NUTS = ring(8, 1, 0);
 
-// Black tyre, steel rim with hand holes, silver hub cap with nuts. Rotated by the scene.
 export function Wheel({cx, rim = 'truck-rim', wheelRef}) {
     return (
-        <g ref={wheelRef} transform={`translate(${cx} 35)`}>
+        <g ref={wheelRef} transform={`translate(${cx} ${WHEEL_Y})`}>
             <circle className="truck-tire" r={WHEEL_RADIUS}/>
             <circle className="truck-tread" r="4.1"/>
             <circle className={rim} r="3.2"/>
@@ -29,7 +30,7 @@ export function Wheel({cx, rim = 'truck-rim', wheelRef}) {
     );
 }
 
-// Headlight beam: only visible at dusk and night (see App.css).
+// Only visible at dusk and night (see App.css).
 export function TruckBeam({id}) {
     return (
         <>
@@ -44,8 +45,7 @@ export function TruckBeam({id}) {
     );
 }
 
-// A container chassis (the deck a container sits on): floor frame, sub-frame, twist locks, under-run bar, side guard
-// rails, landing gear (it slides down when the trailer is parked, see .rt-trailer in App.css) and the tandem axle.
+// Container chassis. The landing gear slides down when the trailer is parked (.rt-trailer in App.css).
 export function TrailerChassis() {
     return (
         <>
@@ -73,8 +73,7 @@ export function TrailerChassis() {
     );
 }
 
-// The tractor without its wheels: frame rails, fifth wheel, fuel tank, battery box, fenders and mud flaps, the exhaust
-// stack, and the short Volvo F12 cab-over cab with the lower front panel stepping out.
+// The tractor without its wheels: Volvo F12 style cab-over cab, frame, tank, fenders, exhaust stack.
 export function TractorBody() {
     return (
         <>

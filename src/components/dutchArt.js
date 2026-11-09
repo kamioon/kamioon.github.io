@@ -1,12 +1,9 @@
-// Dutch scenery for the About page's road scene (see RoadTrip.js): windmills, church towers, a TV tower, wind
-// turbines, pylons, canal houses, tulip fields and poplars. Everything is drawn in the scene's world units, standing
-// on y = EDGE (the far edge of the road) unless said otherwise, and coloured from CSS variables (see App.css) so it
-// follows the time of day. Only plain shapes: SSR safe.
+// Dutch scenery for the About page scene (RoadTrip.js). Everything stands on y = EDGE and is coloured from
+// the CSS variables in App.css, so it follows the time of day.
 
-// The far edge of the road: everything in the landscape stands on it.
-export const EDGE = 102;
+export const EDGE = 102; // the far edge of the road
 
-// A smooth line of low hills from x to x, as a closed shape down to the bottom.
+// Low rolling hills as a closed shape.
 export function hillsPath(from, to, base, amp, phase) {
     const pts = [];
     for (let x = from; x <= to; x += 24) {
@@ -22,7 +19,7 @@ export function hillsPath(from, to, base, amp, phase) {
     return `${d}L${to} ${base + 80}z`;
 }
 
-// A traditional windmill with turning sails.
+// Windmill with turning sails
 export function Windmill({x, y = EDGE, s = 1}) {
     return (
         <g transform={`translate(${x} ${y}) scale(${s})`}>
@@ -45,7 +42,7 @@ export function Windmill({x, y = EDGE, s = 1}) {
     );
 }
 
-// A big brick church tower with an open lantern and a needle spire (a Dom Tower sort of silhouette).
+// Brick church tower with a needle spire
 export function ChurchTower({x, y = EDGE, s = 1}) {
     return (
         <g transform={`translate(${x} ${y}) scale(${s})`}>
@@ -65,7 +62,7 @@ export function ChurchTower({x, y = EDGE, s = 1}) {
     );
 }
 
-// A slender TV tower with a saucer-shaped viewing deck (Euromast style).
+// TV tower with a viewing deck, like the Euromast
 export function Euromast({x, y = EDGE, s = 1}) {
     return (
         <g transform={`translate(${x} ${y}) scale(${s})`}>
@@ -81,7 +78,7 @@ export function Euromast({x, y = EDGE, s = 1}) {
     );
 }
 
-// A modern three-blade wind turbine; the rotor turns slowly.
+// Wind turbine, the rotor turns slowly
 export function Turbine({x, y = EDGE, s = 1, delay = 0}) {
     return (
         <g transform={`translate(${x} ${y}) scale(${s})`}>
@@ -100,7 +97,7 @@ export function Turbine({x, y = EDGE, s = 1, delay = 0}) {
     );
 }
 
-// A high-voltage pylon.
+// High-voltage pylon
 export function Pylon({x, y = EDGE, s = 1}) {
     return (
         <g className="rt-pylon" transform={`translate(${x} ${y}) scale(${s})`}>
@@ -110,7 +107,7 @@ export function Pylon({x, y = EDGE, s = 1}) {
     );
 }
 
-// A tall slender poplar.
+// Poplar
 export function Poplar({x, y = EDGE, s = 1}) {
     return (
         <g transform={`translate(${x} ${y}) scale(${s})`}>
@@ -120,7 +117,7 @@ export function Poplar({x, y = EDGE, s = 1}) {
     );
 }
 
-// A row of narrow Amsterdam style canal houses with different gables, standing on a quay above the canal.
+// Narrow canal houses with different gables
 const HOUSES = [
     {w: 12, h: 36, c: 1, g: 'step'}, {w: 11, h: 42, c: 2, g: 'bell'}, {w: 13, h: 34, c: 3, g: 'point'},
     {w: 11, h: 40, c: 4, g: 'step'}, {w: 12, h: 37, c: 5, g: 'bell'}, {w: 13, h: 43, c: 2, g: 'step'},
@@ -151,7 +148,7 @@ export function CanalHouses({x, y = EDGE - 6, count = HOUSES.length, from = 0}) 
         }
         items.push(
             <g key={i} transform={`translate(${at} 0)`}>
-                <rect className={`rt-house rt-h${c}`} width={w} height={h}  y={-h}/>
+                <rect className={`rt-house rt-h${c}`} width={w} height={h} y={-h}/>
                 <path className={`rt-house rt-h${c}`} d={gable(w, h, g)}/>
                 {windows}
                 <rect className="rt-hdoor" x={w * 0.38} y="-7" width={w * 0.24} height="7"/>
@@ -162,7 +159,7 @@ export function CanalHouses({x, y = EDGE - 6, count = HOUSES.length, from = 0}) 
     return <g transform={`translate(${x} ${y})`}>{items}</g>;
 }
 
-// A canal: a band of water with a few ripples.
+// A band of water with a few ripples
 export function Canal({x, width, y = EDGE - 6, height = 6}) {
     let ripples = '';
     for (let i = 8; i < width - 8; i += 22) ripples += `M${x + i} ${y + 2.2}h8M${x + i + 9} ${y + 4.2}h6`;
@@ -174,7 +171,7 @@ export function Canal({x, width, y = EDGE - 6, height = 6}) {
     );
 }
 
-// A tulip field seen from the road: bands of colour, one behind the other, with the texture of the flower rows.
+// Tulip field: bands of colour, one behind the other
 const TULIPS = ['rt-tulip-yellow', 'rt-tulip-red', 'rt-tulip-pink', 'rt-tulip-purple', 'rt-tulip-orange'];
 
 export function TulipField({x, width, y = EDGE - 14, offset = 0}) {
@@ -195,9 +192,8 @@ export function TulipField({x, width, y = EDGE - 14, offset = 0}) {
     );
 }
 
-// ---------------------------------------------------------------------------------------------------------------
-// A different road through the Netherlands for every trip: landmarks far apart, never two of a kind in a row.
-// Seeded, so the same seed (the one the server renders with) always gives the same picture.
+// A different road for every trip: landmarks far apart, never two of a kind in a row.
+// Seeded, so the server and the browser draw the same picture for the same seed.
 function mulberry32(seed) {
     let a = seed | 0;
     return () => {
@@ -210,8 +206,8 @@ function mulberry32(seed) {
 
 const round = value => Math.round(value * 10) / 10;
 
-// x positions: `world` is the roadside (it moves with the road); `near` and `mid` are layers that move slower
-// (see RoadTrip.js), so their positions are in that layer's own coordinates.
+// `world` is the roadside and moves with the road. `mid` and `near` are layers that move slower (RoadTrip.js),
+// so their x positions are in the layer's own coordinates.
 export function makeTrip(seed) {
     const r = mulberry32(seed);
     const between = (a, b) => round(a + (b - a) * r());
@@ -220,7 +216,7 @@ export function makeTrip(seed) {
     const mid = [];
     const near = [];
 
-    // The roadside: a landmark every 260 to 520 units.
+    // roadside: a landmark every 260 to 520 units
     let x = between(520, 720);
     let previous = '';
     while (x < 3000) {
@@ -252,7 +248,7 @@ export function makeTrip(seed) {
         x += between(260, 520);
     }
 
-    // Far away: wind turbines every 120 to 300 units, one TV tower, a pylon or two.
+    // far away: wind turbines, one TV tower, a pylon or two
     const mast = between(560, 1100);
     for (let p = between(440, 560); p < 1500; p += between(120, 300)) {
         if (Math.abs(p - mast) > 40) mid.push({t: 'turbine', x: round(p), s: between(0.85, 1.15), delay: -between(0, 9)});
@@ -260,7 +256,7 @@ export function makeTrip(seed) {
     mid.push({t: 'euromast', x: mast, s: between(1.1, 1.3)});
     for (let i = whole(1, 2); i > 0; i--) mid.push({t: 'pylon', x: between(450, 1300), s: 1});
 
-    // Nearer: church towers and windmills, hundreds of units apart.
+    // nearer: church towers and windmills, hundreds of units apart
     let q = between(480, 700);
     while (q < 2200) {
         near.push(r() < 0.5 ? {t: 'church', x: round(q), s: between(0.8, 1)} : {t: 'windmill', x: round(q), s: between(0.95, 1.15)});

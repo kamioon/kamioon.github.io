@@ -1,12 +1,12 @@
 import {useLocation, useNavigate} from "react-router-dom";
 import Truck from "./Truck";
 
-// What the trailer says on each page (the default is the Persian word for truck).
+// What the trailer says on each page
 const TAGLINES = [['/blogs', 'BLOG'], ['/tools', 'TOOLS'], ['/contact', 'SAY HELLO']];
 const DEFAULT_TAGLINE = 'کامیون';
 
-// The little truck at the bottom of every page: click it to honk, and it takes you to the About page, which has its
-// own, bigger truck in the road scene.
+// The little truck at the bottom of every page except About, which has its own scene.
+// Click it to honk and go to the About page.
 export default function Footer() {
     const {pathname} = useLocation();
     const navigate = useNavigate();

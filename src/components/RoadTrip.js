@@ -1,69 +1,64 @@
 import {useEffect, useId, useMemo, useRef, useState} from "react";
 import {honk} from "./honk";
-import {Wheel, TrailerChassis, TractorBody, TruckBeam, TRAILER_WHEELS, TRACTOR_WHEELS, WHEEL_RADIUS} from "./truckArt";
+import {Wheel, TrailerChassis, TractorBody, TruckBeam, TRAILER_WHEELS, TRACTOR_WHEELS, WHEEL_RADIUS, spin} from "./truckArt";
 import {
     EDGE, makeTrip, hillsPath, Windmill, ChurchTower, Euromast, Turbine, Pylon, Poplar, CanalHouses, Canal, TulipField,
 } from "./dutchArt";
 
-// The About page's road scene: one little story that repeats.
-//
-//  1. A truck arrives bringing a PHP container. The crane unloads it in the yard, the tractor uncouples and leaves.
+// The About page scene, a small story that loops:
+//  1. A truck brings a PHP container to the yard. The crane unloads it and the tractor leaves.
 //  2. The factory takes the PHP container in and puts a Python container out.
-//  3. Another tractor arrives alone, waits next to the empty trailer while the crane loads the Python container onto
-//     it, backs under the trailer, couples up and drives away...
-//  4. ...the camera zooms out and follows it along a road through the Netherlands (a different, randomly arranged
-//     one every time)...
-//  5. ...and the picture fades back to the yard, where the next truck arrives with a PHP container.
+//  3. A tractor arrives alone, the crane loads the Python container, the tractor backs under the trailer and leaves.
+//  4. The camera zooms out and follows it along a random Dutch road, then it fades back to the yard.
 //
-// It is one SVG world in its own units (the truck's own frame is 100 x 40 of them): the yard is at x 0..340 and the
-// Dutch road runs on to the right. A camera (the viewBox) shows the yard, zooms out and follows the rig; far layers
-// move slower than the road for depth. The markup is static (SSR/hydration safe); the motion is applied from the
-// effect. The sky and the light follow the visitor's local time (data-phase), see App.css.
-const YARD_W = 340; // the yard is shown this wide
-const ABOVE = 124; // units from the top of the crane's beacon down to the wheel line
+// Everything is one SVG in "units" (the truck is 100 x 40). The yard is at x 0..340 and the road runs on to the
+// right. The camera is the viewBox, and the far layers move slower than the road for depth.
+// The markup is static; the motion is applied from the effect.
+const YARD_W = 340;
+const ABOVE = 124; // from the top of the crane's beacon down to the wheel line
 const GROUND = 120; // y of the wheel line
-const SHIFT = GROUND - EDGE; // the yard and the landscape stand this much higher than the wheels: behind the road
+const SHIFT = GROUND - EDGE; // the yard stands this much higher than the wheels, behind the road
 const CAM_HOME = YARD_W / 2;
 
-const BAY = 197.5; // where the trailer is parked (x of its 100-unit frame)
+const BAY = 197.5; // x of the parked trailer
 const STOP_GAP = 40; // the tractor waits this far in front of the trailer, then reverses under it
 const LANE_OFFSET = 3; // the tractor passes the parked trailer in the lane in front of it
 
-const SLOT_X = 102; // left edge of the yard slot where containers are set down and picked up
-const SLOT_TOP = EDGE - 26; // y of the top of a container standing in it
+const SLOT_X = 102; // where containers are set down and picked up in the yard
+const SLOT_TOP = EDGE - 26;
 const CTR_W = 60;
-const DECK_X = 4.5; // a container on the trailer: x within the trailer's frame...
-const DECK_Y = 81; // ...and y on the stage (80 + 1: the deck is at y = 27 in the trailer's frame)
-const REST_X = 190; // the crane's trolley when it has nothing to do
-const CARRY_Y = 36; // container top while it is carried: clear of the yard and of the trailer
+const DECK_X = 4.5; // a container on the trailer: x in the trailer's frame...
+const DECK_Y = 81; // ...and y in the scene
+const REST_X = 190; // the crane's trolley when idle
+const CARRY_Y = 36; // container top while carried
 const SLOT_C = SLOT_X + CTR_W / 2;
 const DROP_C = BAY + DECK_X + CTR_W / 2;
 
-// The crane's work: [seconds, trolley x, container-top y]; every step eases in and out.
+// Crane steps: [seconds, trolley x, container top y], eased in and out.
 const LOAD = { // yard -> trailer
     keys: [[0, REST_X, CARRY_Y], [1.5, SLOT_C, CARRY_Y], [3.0, SLOT_C, SLOT_TOP], [3.6, SLOT_C, SLOT_TOP],
         [5.2, SLOT_C, CARRY_Y], [7.4, DROP_C, CARRY_Y], [9.2, DROP_C, DECK_Y], [9.8, DROP_C, DECK_Y],
         [11.2, DROP_C, CARRY_Y], [12.8, REST_X, CARRY_Y]],
-    attach: 3.6, release: 9.8, to: 'loaded', clear: 11.2, // the tractor may back under the trailer at `clear`
+    attach: 3.6, release: 9.8, to: 'loaded', clear: 11.2, // the tractor can back under the trailer at `clear`
 };
 const UNLOAD = { // trailer -> yard
     keys: [[0, REST_X, CARRY_Y], [1.6, DROP_C, CARRY_Y], [3.2, DROP_C, DECK_Y], [3.8, DROP_C, DECK_Y],
         [5.2, DROP_C, CARRY_Y], [7.4, SLOT_C, CARRY_Y], [9.0, SLOT_C, SLOT_TOP], [9.6, SLOT_C, SLOT_TOP],
         [11.0, SLOT_C, CARRY_Y], [12.4, REST_X, CARRY_Y]],
-    attach: 3.8, release: 9.6, to: 'stack', clear: 5.6, // the tractor may uncouple and leave at `clear`
+    attach: 3.8, release: 9.6, to: 'stack', clear: 5.6, // the tractor can uncouple and leave at `clear`
 };
 
-// The factory: the container slides into the dock and fades out, the factory works, a Python container slides out.
-const SLIDE = 26; // units the container slides into the factory
+// Factory: the container slides in and fades, the factory works, a Python container slides out.
+const SLIDE = 26;
 const IN = 1.4;
 const WORK = 2;
 const OUT = 1.4;
 
-const ZOOM_TIME = 3.6; // seconds to zoom out
+const ZOOM_TIME = 3.6;
 const CRUISE = 105; // units/s on the open road
-const DRIVE_END = 2300; // x of the tractor where the road trip ends and the story cuts back to the yard
+const DRIVE_END = 2300; // where the road trip ends and the story cuts back to the yard
 
-// Parallax: the share of the camera's movement that each far layer follows (1 = the road itself).
+// How much of the camera's movement each far layer follows (1 = the road).
 const FAR_K = 0.15;
 const MID_K = 0.3;
 const NEAR_K = 0.6;
@@ -83,8 +78,7 @@ function sampleCrane(keys, time) {
     return {x: x0 + (x1 - x0) * e, y: y0 + (y1 - y0) * e};
 }
 
-// The container that gets moved around (a 20 ft shipping container, 60 x 26, corrugated, with corner castings).
-// Its label and colour are PHP or Python, switched from the effect.
+// A 20 ft container. Its label and colour switch between PHP and Python from the effect.
 function MovingContainer() {
     const ribs = [];
     for (let x = 4; x < 57; x += 2.8) ribs.push(`M${x.toFixed(1)} 2.2V23.8`);
@@ -105,14 +99,14 @@ function MovingContainer() {
     );
 }
 
-// Steel truss under the crane's beam.
+// Truss under the crane beam
 const TRUSS = (() => {
     let d = '';
     for (let x = 96; x < 312; x += 9) d += `M${x} 15.6L${x + 4.5} 12.4L${x + 9} 15.6`;
     return d;
 })();
 
-// One landmark of a trip, from the generator in dutchArt.js.
+// One landmark from makeTrip (dutchArt.js)
 function item(d, i) {
     const key = `${d.t}${i}`;
     switch (d.t) {
@@ -141,7 +135,7 @@ function item(d, i) {
 }
 
 export default function RoadTrip({children}) {
-    const [seed, setSeed] = useState(1); // the server renders trip 1; the browser picks a new one for every trip
+    const [seed, setSeed] = useState(1); // the server renders trip 1, the browser picks a new one each trip
     const trip = useMemo(() => makeTrip(seed), [seed]);
 
     const rootRef = useRef(null);
@@ -162,13 +156,6 @@ export default function RoadTrip({children}) {
     useEffect(() => {
         const root = rootRef.current;
         const lane = laneRef.current;
-        // The sky follows the visitor's local time (or their dark-mode preference).
-        const hour = new Date().getHours();
-        const dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-        const phaseOfDay = dark || hour >= 20 || hour < 6 ? 'night' : hour >= 18 || hour < 8 ? 'dusk' : 'day';
-        root.dataset.phase = phaseOfDay;
-        lane.dataset.phase = phaseOfDay;
-
         const svg = svgRef.current;
         const layers = [[farRef.current, FAR_K], [midRef.current, MID_K], [nearRef.current, NEAR_K]];
         const tractor = tractorRef.current;
@@ -181,18 +168,18 @@ export default function RoadTrip({children}) {
         const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         const newTrip = () => setSeed(Math.floor(Math.random() * 2147483647));
 
-        let tx = BAY; // x of the tractor's frame
+        let tx = BAY; // x of the tractor
         let vx = 0;
         let yOff = 0; // 0: in the trailer's lane, LANE_OFFSET: in the lane in front of it
         let coupled = false; // the trailer follows the tractor
-        let where = 'stack'; // the container: in the 'stack' (yard slot), on the crane's 'hook', or 'loaded' on the trailer
-        let kind = 'php'; // ...and what it says: 'php' or 'python'
-        let slide = 0; // while the factory takes it in or puts it out: how far into the dock it is (<= 0)
-        let fade = 1; // ...and how visible it is
+        let where = 'stack'; // the container is in the 'stack' (yard slot), on the crane's 'hook' or 'loaded' on the trailer
+        let kind = 'php'; // what it says: 'php' or 'python'
+        let slide = 0; // how far into the factory dock it is (<= 0)
+        let fade = 1;
         let script = LOAD;
-        let craneTime = -1; // seconds into the crane's work; negative while it is idle
+        let craneTime = -1; // negative while the crane is idle
         let crane = {x: REST_X, y: CARRY_Y};
-        let factoryTime = -1; // seconds into the factory's work; negative while it is idle
+        let factoryTime = -1; // negative while the factory is idle
         let factoryStarted = false;
         let ready = false; // the Python container is waiting in the yard
         let tractorAngle = 0;
@@ -204,9 +191,9 @@ export default function RoadTrip({children}) {
         let W = 0;
         let H = 0;
         let curb = 30; // px of road below the wheel line
-        let sYard = 1; // px per unit in the close-up of the yard...
+        let sYard = 1; // px per unit in the yard shot...
         let sWide = 1; // ...and zoomed out
-        let leftYard = 0; // the visible part of the yard shot, in world units
+        let leftYard = 0; // visible part of the yard shot, in units
         let rightYard = YARD_W;
         let raf = 0;
         let last = 0;
@@ -223,10 +210,10 @@ export default function RoadTrip({children}) {
         };
 
         const render = () => {
-            // Camera: close-up of the yard, zooming out and following the rig.
+            // camera: the yard, zooming out and following the rig
             const e = ease(zoomT);
             const s = sYard * Math.pow(sWide / sYard, e);
-            const follow = tx + 50 + (W / s) * 0.2; // the rig a bit left of the middle
+            const follow = tx + 50 + (W / s) * 0.2;
             const camX = CAM_HOME + (follow - CAM_HOME) * e;
             svg.setAttribute('viewBox', `${(camX - W / (2 * s)).toFixed(2)} ${(GROUND - (H - curb) / s).toFixed(2)} ${(W / s).toFixed(2)} ${(H / s).toFixed(2)}`);
             layers.forEach(([layer, k]) => {
@@ -245,19 +232,19 @@ export default function RoadTrip({children}) {
             cable.setAttribute('y2', (crane.y - 10.4).toFixed(2));
             spreader.setAttribute('transform', `translate(0 ${(crane.y - 2.4).toFixed(2)})`);
             TRAILER_WHEELS.forEach((cx, i) => {
-                if (wheels[i]) wheels[i].setAttribute('transform', `translate(${cx} 35) rotate(${trailerAngle.toFixed(1)})`);
+                if (wheels[i]) wheels[i].setAttribute('transform', spin(cx, trailerAngle));
             });
             TRACTOR_WHEELS.forEach((cx, i) => {
-                if (wheels[2 + i]) wheels[2 + i].setAttribute('transform', `translate(${cx} 35) rotate(${tractorAngle.toFixed(1)})`);
+                if (wheels[2 + i]) wheels[2 + i].setAttribute('transform', spin(cx, tractorAngle));
             });
         };
 
-        svg.setAttribute('preserveAspectRatio', 'none'); // the camera makes the viewBox match the box exactly
-        newTrip(); // the first road trip is not the one the server rendered
+        svg.setAttribute('preserveAspectRatio', 'none'); // the camera makes the viewBox match the box
+        newTrip(); // the first trip is not the one the server rendered
         measure();
 
         if (reduceMotion) {
-            // A still picture: the rig loaded with the Python container, ready to go.
+            // a still picture: the rig loaded with the Python container
             kind = 'python';
             ctr.dataset.kind = kind;
             coupled = true;
@@ -267,7 +254,7 @@ export default function RoadTrip({children}) {
             return undefined;
         }
 
-        // First-order speed control with an acceleration limit: a heavy truck never jumps to speed.
+        // Speed eases towards `desired` within an acceleration limit, so a heavy truck never jumps to speed.
         const accelerate = (desired, accel, brake, rate, dt) => {
             const speedingUp = desired * vx >= 0 && Math.abs(desired) > Math.abs(vx);
             const limit = (speedingUp ? accel : brake) * dt;
@@ -279,7 +266,7 @@ export default function RoadTrip({children}) {
             craneTime = 0;
         };
 
-        // The start of the story, and of every round: a rig with a PHP container waits off-screen on the left.
+        // Start of every round: a rig with a PHP container waits off-screen on the left.
         const arrival = () => {
             kind = 'php';
             ctr.dataset.kind = kind;
@@ -305,7 +292,7 @@ export default function RoadTrip({children}) {
 
         const frame = now => {
             raf = requestAnimationFrame(frame);
-            // React clears the refs when the scene leaves the page, a moment before this effect is cleaned up.
+            // After a redirect React clears the refs before this effect is cleaned up.
             if (!laneRef.current) {
                 stop();
                 return;
@@ -316,10 +303,10 @@ export default function RoadTrip({children}) {
             const before = tx;
 
             if (phase === 'wait') {
-                tx = leftYard - 104; // stay out of sight, even if the window was resized meanwhile
+                tx = leftYard - 104; // stay out of sight, even after a resize
                 clock -= dt;
                 if (clock <= 0) phase = 'arrive';
-            } else if (phase === 'arrive') { // the rig with the PHP container drives in and stops at the bay
+            } else if (phase === 'arrive') { // the rig with the PHP container stops at the bay
                 accelerate(clamp((BAY - tx) * 0.9, 0, CRUISE), 55, 90, 3, dt);
                 tx += vx * dt;
                 if (BAY - tx < 0.5 && vx < 4) {
@@ -332,8 +319,8 @@ export default function RoadTrip({children}) {
                 if (craneTime < 0 || craneTime >= UNLOAD.clear) {
                     phase = 'uncouple';
                     clock = 1.1;
-                    coupled = false; // the trailer stays where it is...
-                    trailer.classList.add('parked'); // ...and puts its landing gear down
+                    coupled = false; // the trailer stays, with its landing gear down
+                    trailer.classList.add('parked');
                 }
             } else if (phase === 'uncouple') {
                 clock -= dt;
@@ -345,7 +332,7 @@ export default function RoadTrip({children}) {
                     phase = 'gone';
                     clock = 1;
                 }
-            } else if (phase === 'gone') { // another tractor comes in from the left, alone
+            } else if (phase === 'gone') { // another tractor comes in from the left
                 clock -= dt;
                 if (clock <= 0) {
                     tx = leftYard - 104;
@@ -362,7 +349,7 @@ export default function RoadTrip({children}) {
                     vx = 0;
                     phase = 'ready';
                 }
-            } else if (phase === 'ready') { // it waits until the Python container is out and the crane is free
+            } else if (phase === 'ready') { // waits for the Python container and a free crane
                 if (ready && craneTime < 0) {
                     phase = 'load';
                     startCrane(LOAD);
@@ -381,7 +368,7 @@ export default function RoadTrip({children}) {
                     vx = 0;
                     yOff = 0;
                     coupled = true;
-                    trailer.classList.remove('parked'); // the landing gear goes up
+                    trailer.classList.remove('parked');
                     tractor.classList.remove('reversing');
                     phase = 'couple';
                     clock = 1.4;
@@ -393,7 +380,7 @@ export default function RoadTrip({children}) {
                 accelerate(CRUISE, 24, 60, 1.2, dt);
                 tx += vx * dt;
                 if (tx > BAY + 50) {
-                    zooming = true; // zoom out and follow it
+                    zooming = true;
                     phase = 'drive';
                 }
             } else if (phase === 'drive') {
@@ -407,7 +394,7 @@ export default function RoadTrip({children}) {
             } else if (phase === 'fadeOut') {
                 clock -= dt;
                 if (clock <= 0) {
-                    newTrip(); // the next road trip will be a different one
+                    newTrip();
                     arrival();
                     phase = 'fadeIn';
                     clock = 0.4;
@@ -423,7 +410,7 @@ export default function RoadTrip({children}) {
                 crane = sampleCrane(script.keys, craneTime);
                 if (craneTime >= script.release) where = script.to;
                 else if (craneTime >= script.attach) where = 'hook';
-                // Once the PHP container is down in the yard and the hook is clear, the factory takes it in.
+                // once the PHP container is down and the hook is clear, the factory takes it in
                 if (script === UNLOAD && !factoryStarted && craneTime >= UNLOAD.release + 1.2) {
                     factoryStarted = true;
                     factoryTime = 0;
@@ -434,11 +421,11 @@ export default function RoadTrip({children}) {
             if (factoryTime >= 0) {
                 factoryTime += dt;
                 const t = factoryTime;
-                if (t < IN) { // slides into the dock and fades out
+                if (t < IN) {
                     const e = ease(t / IN);
                     slide = -SLIDE * e;
                     fade = 1 - e;
-                } else if (t < IN + WORK) { // the factory works; PHP goes in, Python comes out
+                } else if (t < IN + WORK) { // PHP goes in, Python comes out
                     slide = -SLIDE;
                     fade = 0;
                     root.classList.add('working');
@@ -446,7 +433,7 @@ export default function RoadTrip({children}) {
                         kind = 'python';
                         ctr.dataset.kind = kind;
                     }
-                } else if (t < IN + WORK + OUT) { // the Python container slides out of the dock
+                } else if (t < IN + WORK + OUT) {
                     const e = ease((t - IN - WORK) / OUT);
                     slide = -SLIDE * (1 - e);
                     fade = e;
@@ -462,7 +449,7 @@ export default function RoadTrip({children}) {
 
             if (zooming) zoomT = Math.min(1, zoomT + dt / ZOOM_TIME);
 
-            // Wheels turn with the ground speed (backwards when reversing); the trailer's only when it is hitched.
+            // wheels turn with the ground speed; the trailer's only when it is hitched
             const dx = tx - before;
             const turn = dx * (180 / Math.PI) / WHEEL_RADIUS;
             tractorAngle = (tractorAngle + turn) % 360;
@@ -484,7 +471,7 @@ export default function RoadTrip({children}) {
         phase = 'wait';
         clock = 1.2;
         render();
-        // Only animate while the scene is on screen.
+        // only animate while the scene is on screen
         let observer = null;
         if ('IntersectionObserver' in window) {
             observer = new IntersectionObserver(([entry]) => (entry.isIntersecting ? start() : stop()));
@@ -498,7 +485,6 @@ export default function RoadTrip({children}) {
         };
     }, []);
 
-    // Click (or Enter/Space when focused) the tractor to honk; its lights flash along with it.
     const onHonk = () => {
         honk();
         const lane = laneRef.current;
@@ -509,33 +495,13 @@ export default function RoadTrip({children}) {
 
     return (
         <section className="roadtrip" ref={rootRef} aria-label="Trucks bringing and taking away containers">
-            <div className="rt-sun" aria-hidden="true"/>
-            <div className="rt-stars" aria-hidden="true"/>
-            <div className="rt-clouds" aria-hidden="true">
-                <i className="rt-cloud" style={{top: '70px', animationDuration: '140s', animationDelay: '-30s'}}/>
-                <i className="rt-cloud rt-cloud-small" style={{top: '170px', animationDuration: '190s', animationDelay: '-120s'}}/>
-                <i className="rt-cloud rt-cloud-small" style={{top: '330px', animationDuration: '230s', animationDelay: '-70s'}}/>
-                <i className="rt-cloud" style={{top: '455px', animationDuration: '170s', animationDelay: '-90s'}}/>
-                <i className="rt-cloud rt-cloud-small" style={{top: '540px', animationDuration: '210s', animationDelay: '-10s'}}/>
-            </div>
-            <div className="rt-plane" aria-hidden="true">
-                <i className="rt-contrail"/>
-                <svg viewBox="0 0 60 20" width="54" height="18">
-                    <path className="rt-plane-body" d="M2 10.4L40 8.6Q47 8 52 9.6L58 10.6Q59 11 58 11.6L52 12Q47 13.2 40 12.6L2 11.6z"/>
-                    <path className="rt-plane-body" d="M25 9.4L17 2.4H21L33 9.4zM25 12L17 19H21L33 12zM4 10.6L1 4.4H5L9.4 9.6z"/>
-                    <circle className="rt-plane-light" cx="2" cy="11" r="1"/>
-                </svg>
-            </div>
-            <svg className="rt-birds" viewBox="0 0 90 30" width="90" height="30" aria-hidden="true">
-                <path d="M0 8q3-4 6 0q3-4 6 0M22 3q3-4 6 0q3-4 6 0M40 14q3-4 6 0q3-4 6 0M62 6q3-4 6 0q3-4 6 0M76 20q3-4 6 0q3-4 6 0"/>
-            </svg>
             <div className="rt-top">{children}</div>
-            <div className="truck-lane roadtrip-lane" ref={laneRef}
+            <div className="roadtrip-lane" ref={laneRef}
                  onAnimationEnd={event => event.currentTarget.classList.remove('honking')}>
                 <svg ref={svgRef} className="rt-stage" viewBox={`0 0 ${YARD_W} 140`}
                      preserveAspectRatio="xMidYMax meet" focusable="false">
                     <g aria-hidden="true">
-                        {/* Far away: hills, then wind turbines, pylons and a TV tower; nearer: hills, church towers, windmills */}
+                        {/* far: hills, turbines, pylons, TV tower. nearer: hills, church towers, windmills */}
                         <g ref={farRef}>
                             <path className="rt-hill-far" d={FAR_HILLS}/>
                         </g>
@@ -547,11 +513,11 @@ export default function RoadTrip({children}) {
                             {trip.near.map(item)}
                         </g>
 
-                        {/* The roadside: grass, then whatever this trip's road passes */}
+                        {/* roadside */}
                         <rect className="rt-verge" x="-1500" y={EDGE - 8} width="5000" height="10"/>
                         {trip.world.map(item)}
 
-                        {/* The yard: the factory stands a little behind the road */}
+                        {/* factory */}
                         <g transform={`translate(0 ${-SHIFT})`}>
                             <rect className="rt-brick" x="18" y="44" width="8" height="36"/>
                             <rect className="rt-brick rt-brick-cap" x="17" y="42" width="10" height="3"/>
@@ -572,7 +538,7 @@ export default function RoadTrip({children}) {
                             <path className="rt-door-slats" d="M76 101.5H94M76 104H94M76 106.5H94"/>
                         </g>
 
-                        {/* The crane: two A-frame legs, a beam with a truss, the operator's cab and a beacon */}
+                        {/* crane */}
                         <path className="rt-crane-leg"
                               d={`M164 ${EDGE}L171 17L178 ${EDGE}M292 ${EDGE}L299 17L306 ${EDGE}M166.6 80H175.4M294.6 80H303.4`}/>
                         <rect className="rt-crane" x="96" y="10" width="218" height="2.4"/>
@@ -583,12 +549,12 @@ export default function RoadTrip({children}) {
                         <path className="rt-crane-truss" d="M299 10V5"/>
                         <circle className="rt-beacon" cx="299" cy="4.4" r="1.6"/>
 
-                        {/* The road: asphalt, the white edge line and the dashed middle line */}
+                        {/* road */}
                         <rect className="rt-asphalt" x="-1500" y={EDGE} width="5000" height="100"/>
                         <rect className="rt-edge" x="-1500" y={EDGE} width="5000" height="1.2"/>
                         <path className="rt-dash" d="M-1500 129H3500"/>
 
-                        {/* The trolley, with its cable and the spreader that grabs the container */}
+                        {/* trolley, cable and spreader */}
                         <g ref={trolleyRef} transform={`translate(${REST_X} 0)`}>
                             <rect className="rt-trolley" x="-5" y="17.4" width="10" height="4.6" rx="1"/>
                             <line ref={cableRef} className="rt-cable" x1="0" y1="22" x2="0" y2={CARRY_Y - 10.4}/>
@@ -600,7 +566,6 @@ export default function RoadTrip({children}) {
                         </g>
                     </g>
 
-                    {/* The trailer, parked in its bay with the landing gear down */}
                     <g ref={trailerRef} className="rt-trailer parked" aria-hidden="true" transform={`translate(${BAY} 80)`}>
                         <TrailerChassis/>
                         {TRAILER_WHEELS.map((cx, i) => (
@@ -609,13 +574,12 @@ export default function RoadTrip({children}) {
                         ))}
                     </g>
 
-                    {/* The container that is moved around: PHP in, Python out */}
                     <g ref={ctrRef} className="rt-dyn" data-kind="python" aria-hidden="true"
                        transform={`translate(${SLOT_X} ${SLOT_TOP})`}>
                         <MovingContainer/>
                     </g>
 
-                    {/* The tractor. Click it to honk. */}
+                    {/* click it to honk */}
                     <g ref={tractorRef} className="rt-tractor" role="button" tabIndex={0} aria-label="Honk the horn"
                        transform="translate(-150 83)" onClick={onHonk}
                        onKeyDown={event => {
