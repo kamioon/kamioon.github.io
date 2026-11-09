@@ -15,13 +15,66 @@ const SATURATION = (() => {
 
 let context = null;
 let current = null; // the horn that is sounding right now, if any
+let silence = null; // iOS fallback, see keepAudible()
+let silenceTimer = 0;
 
 function audioContext() {
     const Context = window.AudioContext || window.webkitAudioContext;
     if (!Context) return null;
-    if (!context) context = new Context();
-    if (context.state === 'suspended') context.resume();
+    if (!context) {
+        context = new Context();
+        // Older iOS only unlocks audio once something has been started inside the tap.
+        const unlock = context.createBufferSource();
+        unlock.buffer = context.createBuffer(1, 1, context.sampleRate);
+        unlock.connect(context.destination);
+        unlock.start(0);
+    }
     return context;
+}
+
+// A tiny silent clip, so no audio file is needed. Looping, it keeps an iOS audio session open.
+function silentClip() {
+    const rate = 8000;
+    const samples = 800;
+    const view = new DataView(new ArrayBuffer(44 + samples));
+    const text = (offset, value) => [...value].forEach((char, i) => view.setUint8(offset + i, char.charCodeAt(0)));
+    text(0, 'RIFF');
+    view.setUint32(4, 36 + samples, true);
+    text(8, 'WAVEfmt ');
+    view.setUint32(16, 16, true);
+    view.setUint16(20, 1, true); // PCM
+    view.setUint16(22, 1, true); // mono
+    view.setUint32(24, rate, true);
+    view.setUint32(28, rate, true);
+    view.setUint16(32, 1, true);
+    view.setUint16(34, 8, true); // 8-bit
+    text(36, 'data');
+    view.setUint32(40, samples, true);
+    for (let i = 0; i < samples; i++) view.setUint8(44 + i, 128); // 128 is silence in 8-bit PCM
+    const audio = new Audio(URL.createObjectURL(new Blob([view], {type: 'audio/wav'})));
+    audio.loop = true;
+    return audio;
+}
+
+// iPhones keep Web Audio on a session that the ringer (silent) switch mutes, which is why a horn that
+// works on desktop can be silent there. Moving the page to the "playback" session makes it audible.
+function keepAudible(seconds) {
+    try {
+        if (navigator.audioSession) {
+            navigator.audioSession.type = 'playback';
+            return;
+        }
+        const ios = /iP(hone|ad|od)/.test(navigator.userAgent) ||
+            (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        if (!ios) return;
+        // Older iOS: a media element that is playing puts the page on the same session.
+        if (!silence) silence = silentClip();
+        silence.play().catch(() => {});
+        clearTimeout(silenceTimer);
+        silenceTimer = setTimeout(() => silence.pause(), (seconds + 1) * 1000);
+    } catch (error) {
+        // Not worth breaking the honk over.
+    }
 }
 
 function noiseBuffer(ctx, seconds) {
@@ -31,9 +84,21 @@ function noiseBuffer(ctx, seconds) {
     return buffer;
 }
 
+// Call from a click or tap: browsers only start audio from a user gesture.
 export function honk(seconds = 0.9) {
     const ctx = audioContext();
     if (!ctx) return;
+    keepAudible(seconds);
+    if (ctx.state === 'running') {
+        sound(ctx, seconds);
+    } else {
+        // Scheduling on a suspended context (the first tap, or after an iOS interruption) can play nothing,
+        // so start the horn once it is actually running.
+        ctx.resume().then(() => sound(ctx, seconds), () => {});
+    }
+}
+
+function sound(ctx, seconds) {
     if (current) current.cut(); // pressing again restarts the horn
 
     const start = ctx.currentTime + 0.02;

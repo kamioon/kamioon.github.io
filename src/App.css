@@ -245,9 +245,10 @@ a.target_blank:hover {
     min-height: 100vh;
     min-height: 100dvh;
     padding-bottom: 56px; /* room for the footer */
+    overflow-x: clip; /* the full-width road scene on the About page must not add a sideways scrollbar */
 }
 
-/* Footer: a Volvo F12 style truck patrolling a road, see components/Footer.js. */
+/* Footer: a Volvo F12 style truck patrolling a road, see components/Footer.js and components/Truck.js. */
 .truck-footer {
     position: absolute;
     left: 0;
@@ -258,20 +259,29 @@ a.target_blank:hover {
     pointer-events: none;
 }
 
+/* The box the truck drives in. Its size comes from --truck-w and the road surface from --ground. */
+.truck-lane {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+}
+
 .truck-road {
     position: absolute;
     left: 0;
     right: 0;
-    bottom: 10px;
+    bottom: calc(var(--ground, 11px) - 1px);
     border-top: 1px dashed rgba(0, 0, 0, 0.3);
 }
 
 .truck {
     position: absolute;
     left: 0;
-    bottom: 11px; /* wheels rest on the road line */
-    width: 100px;
-    height: 40px;
+    bottom: var(--ground, 11px); /* wheels rest on the road line */
+    width: var(--truck-w, 100px);
+    height: calc(var(--truck-w, 100px) * 0.4);
     will-change: transform;
     /* It is a button (click to honk); the rest of the footer lets clicks through. */
     padding: 0;
@@ -287,12 +297,24 @@ a.target_blank:hover {
     display: block;
     width: 100%;
     height: 100%;
+    overflow: visible; /* the headlight beam reaches past the drawing */
+}
+
+/* On touch screens the truck is small and moving, so give a thumb a larger target than the drawing. */
+@media (pointer: coarse) {
+    .truck::before {
+        content: '';
+        position: absolute;
+        top: -10px;
+        right: -12px;
+        bottom: -10px;
+        left: -12px;
+    }
 }
 
 @media only screen and (max-width: 480px) {
-    .truck {
-        width: 80px;
-        height: 32px;
+    .truck-footer {
+        --truck-w: 80px;
     }
 }
 
@@ -312,6 +334,36 @@ a.target_blank:hover {
     fill: #c8102f;
 }
 
+/* Lettering on the trailer */
+.truck-livery-name {
+    font: italic 900 9px "Arial Black", "Helvetica Neue", Arial, sans-serif;
+    fill: #1c1c1c;
+}
+
+.truck-livery-line {
+    font: 700 3.2px "Helvetica Neue", Arial, sans-serif;
+    letter-spacing: 0.3px;
+    fill: #c8102f;
+}
+
+/* Dusk and night (set from the visitor's local time or dark-mode preference): lights on, with a beam. */
+.truck-beam {
+    opacity: 0;
+    transition: opacity 1.2s ease;
+}
+
+.truck-lane[data-phase="dusk"] .truck-beam,
+.truck-lane[data-phase="night"] .truck-beam {
+    opacity: 1;
+}
+
+.truck-lane[data-phase="dusk"] .truck-headlight,
+.truck-lane[data-phase="night"] .truck-headlight {
+    fill: #fffbe0;
+    stroke: rgba(255, 244, 196, 0.55);
+    stroke-width: 0.8;
+}
+
 /* Chassis and small dark parts */
 .truck-frame,
 .truck-trim {
@@ -323,7 +375,9 @@ a.target_blank:hover {
 }
 
 .truck-tank {
-    fill: #9c9c9c;
+    fill: #c3c7cc;
+    stroke: #7f8387;
+    stroke-width: 0.3;
 }
 
 .truck-strap {
@@ -363,24 +417,70 @@ a.target_blank:hover {
     fill: #fff3c4;
 }
 
-/* Wheels */
+/* Fenders, mud flaps, bumper, air hoses */
+.truck-fender {
+    fill: #1c1c1c;
+}
+
+.truck-guard {
+    fill: none;
+    stroke: #1c1c1c;
+    stroke-width: 1;
+}
+
+.truck-bumper {
+    fill: #b9bec4;
+}
+
+.truck-hose-red,
+.truck-hose-yellow {
+    fill: none;
+    stroke-width: 0.5;
+    stroke-linecap: round;
+}
+
+.truck-hose-red {
+    stroke: #d42a2a;
+}
+
+.truck-hose-yellow {
+    stroke: #f2c200;
+}
+
+/* Wheels: black tyre, steel rim with hand holes, silver hub cap with nuts */
 .truck-tire {
-    fill: #222;
+    fill: #1c1c1c;
 }
 
 .truck-tread {
     fill: none;
-    stroke: #3d3d3d;
-    stroke-width: 0.6;
+    stroke: #353535;
+    stroke-width: 0.5;
 }
 
 .truck-rim {
-    fill: #cfcfcf;
+    fill: #c8102f;
+    stroke: #e6e6e6;
+    stroke-width: 0.3;
 }
 
-.truck-lug,
+.truck-rim-trailer {
+    fill: #b9b9b9;
+    stroke: #8f8f8f;
+}
+
+.truck-hole {
+    fill: #1f1f1f;
+}
+
 .truck-hub {
-    fill: #555;
+    fill: #d7d9dc;
+    stroke: #8d9094;
+    stroke-width: 0.25;
+}
+
+.truck-lug {
+    fill: #6b6f74;
 }
 
 /* Honk: the headlights and roof lights flash with a glow. */
@@ -396,19 +496,19 @@ a.target_blank:hover {
     }
 }
 
-.truck-footer.honking .truck-headlight {
+.truck-lane.honking .truck-headlight {
     stroke: rgba(255, 244, 196, 0.6);
     animation: truck-flash 0.9s ease-in-out;
 }
 
-.truck-footer.honking .truck-light-amber {
+.truck-lane.honking .truck-light-amber {
     stroke: rgba(255, 179, 0, 0.55);
     animation: truck-flash 0.9s ease-in-out;
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .truck-footer.honking .truck-headlight,
-    .truck-footer.honking .truck-light-amber {
+    .truck-lane.honking .truck-headlight,
+    .truck-lane.honking .truck-light-amber {
         animation: none;
     }
 }
@@ -432,4 +532,805 @@ a.target_blank:hover {
         top: 2em;
         max-width: 80%;
     }
+}
+/* ---------- About page: the road scene (components/RoadTrip.js) ---------- */
+
+/* One scene: the sky continues behind the About card, the yard and the road are below it. */
+.roadtrip {
+    --sky-top: #6db8f5;
+    --sky-bottom: #eaf6ff;
+    --far: #a8d39a;
+    --near: #80b56d;
+    --verge: #5f9b4f;
+    --asphalt: #565962;
+    --frame: #7a808b;
+    --mark: #f2f2f2;
+    --cloud: #ffffff;
+    --wall: #cbc5bc;
+    --wall-dark: #aca69d;
+    --roof: #6f7783;
+    --win: #9cc3da;
+    --brick: #a35a47;
+    --smoke: #f4f4f4;
+    --crane: #e2ac27;
+    --steel: #565b63;
+    --mill: #5a4a42;
+    --mill-dark: #3b312d;
+    --sail: #d9d2c6;
+    --tower: #a2604a;
+    --tower-light: #d6cab6;
+    --spire: #4f5662;
+    --concrete: #d0d3d8;
+    --turbine: #f4f6f8;
+    --pylon: #6b7380;
+    --h1: #a8523d;
+    --h2: #c9a063;
+    --h3: #d8cdb8;
+    --h4: #6f8798;
+    --h5: #7a3f35;
+    --hwin: #bcd6e6;
+    --water: #6aa6c9;
+    --foliage: #4f8a47;
+    --trunk: #5b4636;
+    --t-yellow: #f2c818;
+    --t-red: #d8352f;
+    --t-pink: #e56fa8;
+    --t-purple: #8e4fb3;
+    --t-orange: #f08a24;
+    position: relative;
+    left: 50%;
+    width: 100vw;
+    margin: 1.2em 0 -56px -50vw; /* the road runs to the bottom of the page (it has no footer) */
+    overflow: hidden;
+    /* The card on top, the scene filling the rest of the screen, so the page needs no scrolling. */
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    min-height: 100dvh;
+    background: linear-gradient(var(--sky-top), var(--sky-bottom) calc(100% - 140px));
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+}
+
+.roadtrip[data-phase="dusk"] {
+    --sky-top: #36468c;
+    --sky-bottom: #ffa877;
+    --far: #5c6e68;
+    --near: #455a49;
+    --verge: #3c5d40;
+    --asphalt: #41434c;
+    --frame: #666c78;
+    --cloud: #ffd0b6;
+    --wall: #918a92;
+    --wall-dark: #7a747d;
+    --roof: #4d5460;
+    --win: #ffd37a;
+    --brick: #7b4439;
+    --smoke: #d7c3c4;
+    --crane: #c98a28;
+    --steel: #3f444c;
+    --mill: #3a2f33;
+    --mill-dark: #241d22;
+    --sail: #9f8f8a;
+    --tower: #7b4a43;
+    --tower-light: #a39bab;
+    --spire: #3a3f4c;
+    --concrete: #a99fa8;
+    --turbine: #e0d4d4;
+    --pylon: #4a4a58;
+    --h1: #82402f;
+    --h2: #9a7648;
+    --h3: #a69b92;
+    --h4: #54677a;
+    --h5: #5a2f2b;
+    --hwin: #ffd37a;
+    --water: #5f7fa8;
+    --foliage: #3b6a3d;
+    --trunk: #3b2e29;
+    --t-yellow: #c9a01a;
+    --t-red: #a62e2c;
+    --t-pink: #b3597f;
+    --t-purple: #704092;
+    --t-orange: #c06e22;
+}
+
+.roadtrip[data-phase="night"] {
+    --sky-top: #050918;
+    --sky-bottom: #1b2756;
+    --far: #1b2937;
+    --near: #132230;
+    --verge: #15301f;
+    --asphalt: #2d3038;
+    --frame: #565c68;
+    --mark: #cfcfcf;
+    --cloud: #2a3662;
+    --wall: #3e4356;
+    --wall-dark: #30344a;
+    --roof: #272c38;
+    --win: #ffd36b;
+    --brick: #4d2e2c;
+    --smoke: #8e94a6;
+    --crane: #8c6a24;
+    --steel: #2a2e36;
+    --mill: #1d1a22;
+    --mill-dark: #121018;
+    --sail: #5c5a66;
+    --tower: #3a2a2e;
+    --tower-light: #4a4a5a;
+    --spire: #20242e;
+    --concrete: #6d7388;
+    --turbine: #aeb5c6;
+    --pylon: #272b36;
+    --h1: #4d2b27;
+    --h2: #50432e;
+    --h3: #4c4a4a;
+    --h4: #2f3b47;
+    --h5: #3a1f21;
+    --hwin: #ffd36b;
+    --water: #213a60;
+    --foliage: #1c3a24;
+    --trunk: #261c18;
+    --t-yellow: #8a7210;
+    --t-red: #702020;
+    --t-pink: #7a3d58;
+    --t-purple: #4b2c63;
+    --t-orange: #7d4a14;
+}
+
+/* Sun by day, low and orange at dusk, a shaded moon at night. */
+.rt-sun {
+    position: absolute;
+    left: 9%;
+    top: 34px;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: #ffe27a;
+    box-shadow: 0 0 36px 12px rgba(255, 226, 122, 0.55);
+}
+
+.roadtrip[data-phase="dusk"] .rt-sun {
+    left: 12%;
+    top: auto;
+    bottom: 190px;
+    background: #ff8a4c;
+    box-shadow: 0 0 40px 16px rgba(255, 138, 76, 0.5);
+}
+
+.roadtrip[data-phase="night"] .rt-sun {
+    background: #f4f6ff;
+    box-shadow: inset -9px -4px 0 0 #aab5e6, 0 0 26px 6px rgba(190, 205, 255, 0.3);
+}
+
+.rt-stars {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    height: 70%;
+    opacity: 0;
+    transition: opacity 1.2s ease;
+    background-image:
+        radial-gradient(1.5px 1.5px at 8% 12%, #fff 60%, transparent 62%),
+        radial-gradient(1px 1px at 17% 41%, #fff 60%, transparent 62%),
+        radial-gradient(1.5px 1.5px at 26% 8%, #fff 60%, transparent 62%),
+        radial-gradient(1px 1px at 33% 57%, #fff 60%, transparent 62%),
+        radial-gradient(1.5px 1.5px at 41% 22%, #fff 60%, transparent 62%),
+        radial-gradient(1px 1px at 57% 11%, #fff 60%, transparent 62%),
+        radial-gradient(1.5px 1.5px at 64% 47%, #fff 60%, transparent 62%),
+        radial-gradient(1px 1px at 72% 19%, #fff 60%, transparent 62%),
+        radial-gradient(1.5px 1.5px at 81% 7%, #fff 60%, transparent 62%),
+        radial-gradient(1px 1px at 88% 36%, #fff 60%, transparent 62%),
+        radial-gradient(1.5px 1.5px at 95% 16%, #fff 60%, transparent 62%),
+        radial-gradient(1px 1px at 5% 63%, #fff 60%, transparent 62%),
+        radial-gradient(1.5px 1.5px at 93% 58%, #fff 60%, transparent 62%);
+}
+
+.roadtrip[data-phase="dusk"] .rt-stars {
+    opacity: 0.35;
+}
+
+.roadtrip[data-phase="night"] .rt-stars {
+    opacity: 1;
+}
+
+.rt-cloud {
+    position: absolute;
+    left: 0;
+    width: 120px;
+    height: 26px;
+    border-radius: 26px;
+    background: var(--cloud);
+    opacity: 0.85;
+    animation: rt-drift 140s linear infinite;
+}
+
+.rt-cloud::before,
+.rt-cloud::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    background: inherit;
+}
+
+.rt-cloud::before {
+    left: 20px;
+    top: -22px;
+    width: 50px;
+    height: 50px;
+}
+
+.rt-cloud::after {
+    left: 62px;
+    top: -14px;
+    width: 38px;
+    height: 38px;
+}
+
+.rt-cloud-small {
+    transform-origin: left center;
+    scale: 0.7;
+}
+
+@keyframes rt-drift {
+    from {
+        transform: translateX(-180px);
+    }
+    to {
+        transform: translateX(100vw);
+    }
+}
+
+/* Life in the sky: a plane with a contrail, and a few birds. */
+.rt-plane {
+    position: absolute;
+    top: 62%;
+    left: 0;
+    animation: rt-fly 110s linear infinite;
+    animation-delay: -40s;
+}
+
+.rt-plane svg {
+    display: block;
+}
+
+.rt-contrail {
+    position: absolute;
+    right: 90%;
+    top: 9px;
+    width: 260px;
+    height: 2px;
+    background: linear-gradient(to left, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0));
+}
+
+.rt-plane-body {
+    fill: #fff;
+}
+
+.rt-plane-light {
+    fill: #ff3b30;
+    opacity: 0;
+}
+
+.roadtrip[data-phase="night"] .rt-plane-body {
+    fill: #9aa3b8;
+}
+
+.roadtrip[data-phase="night"] .rt-plane-light {
+    opacity: 1;
+    animation: rt-blink 1.2s steps(1) infinite;
+}
+
+.roadtrip[data-phase="night"] .rt-contrail {
+    opacity: 0.25;
+}
+
+.rt-birds {
+    position: absolute;
+    top: 74%;
+    left: 0;
+    fill: none;
+    stroke: #3b4a63;
+    stroke-width: 1.2;
+    stroke-linecap: round;
+    animation: rt-fly 150s linear infinite;
+    animation-delay: -75s;
+}
+
+.roadtrip[data-phase="dusk"] .rt-birds {
+    stroke: #3a2f4a;
+}
+
+.roadtrip[data-phase="night"] .rt-birds {
+    opacity: 0;
+}
+
+@keyframes rt-fly {
+    from {
+        transform: translateX(-340px);
+    }
+    to {
+        transform: translateX(100vw);
+    }
+}
+
+/* The About card floats in the sky. */
+.rt-top {
+    position: relative;
+    z-index: 2;
+    box-sizing: border-box;
+    max-width: 600px;
+    flex: none;
+    margin: 0 auto;
+    padding: 0.9em 0 0;
+}
+
+.roadtrip .about {
+    background-color: rgba(255, 255, 255, 0.82);
+    box-shadow: 0 6px 22px rgba(0, 0, 0, 0.18);
+}
+
+.roadtrip-lane {
+    position: relative;
+    top: auto;
+    right: auto;
+    bottom: auto;
+    left: auto;
+    flex: 1 1 auto;
+    height: auto;
+    min-height: 230px;
+}
+
+/* The world: yard, landscape and road in one SVG that the camera moves over (see RoadTrip.js). */
+.rt-stage {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    transition: opacity 0.8s ease;
+    pointer-events: none; /* only the tractor takes clicks */
+}
+
+.rt-hill-far {
+    fill: var(--far);
+}
+
+.rt-hill-near {
+    fill: var(--near);
+}
+
+.rt-distant {
+    opacity: 0.85;
+}
+
+.rt-verge {
+    fill: var(--verge);
+}
+
+.rt-asphalt {
+    fill: var(--asphalt);
+}
+
+.rt-edge {
+    fill: rgba(255, 255, 255, 0.65);
+}
+
+.rt-dash {
+    fill: none;
+    stroke: var(--mark);
+    stroke-width: 1.3;
+    stroke-dasharray: 14 16;
+}
+
+/* Dutch scenery */
+.rt-mill-body {
+    fill: var(--mill);
+}
+
+.rt-mill-dark {
+    fill: var(--mill-dark);
+}
+
+.rt-blades,
+.rt-rotor {
+    fill: var(--mill-dark);
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: rt-spin 26s linear infinite;
+}
+
+.rt-rotor {
+    fill: none;
+    animation-duration: 9s;
+}
+
+.rt-sail {
+    fill: var(--sail);
+}
+
+.rt-tower-brick {
+    fill: var(--tower);
+}
+
+.rt-tower-stone {
+    fill: var(--tower-light);
+}
+
+.rt-tower-dark {
+    fill: rgba(0, 0, 0, 0.5);
+}
+
+.rt-spire {
+    fill: var(--spire);
+}
+
+.rt-concrete {
+    fill: var(--concrete);
+}
+
+.rt-concrete-dark {
+    filter: brightness(0.82);
+}
+
+.rt-mast-red {
+    fill: #d9423a;
+}
+
+.rt-turbine {
+    fill: var(--turbine);
+}
+
+.rt-pylon {
+    fill: none;
+    stroke: var(--pylon);
+    stroke-width: 0.9;
+}
+
+.rt-trunk {
+    fill: var(--trunk);
+}
+
+.rt-foliage {
+    fill: var(--foliage);
+}
+
+.rt-house {
+    stroke: rgba(0, 0, 0, 0.12);
+    stroke-width: 0.3;
+}
+
+.rt-h1 {
+    fill: var(--h1);
+}
+
+.rt-h2 {
+    fill: var(--h2);
+}
+
+.rt-h3 {
+    fill: var(--h3);
+}
+
+.rt-h4 {
+    fill: var(--h4);
+}
+
+.rt-h5 {
+    fill: var(--h5);
+}
+
+.rt-hwin {
+    fill: var(--hwin);
+    stroke: rgba(0, 0, 0, 0.25);
+    stroke-width: 0.3;
+}
+
+.rt-hdoor {
+    fill: rgba(0, 0, 0, 0.45);
+}
+
+.rt-water {
+    fill: var(--water);
+}
+
+.rt-ripple {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.4);
+    stroke-width: 0.5;
+}
+
+.rt-tulip-yellow {
+    fill: var(--t-yellow);
+}
+
+.rt-tulip-red {
+    fill: var(--t-red);
+}
+
+.rt-tulip-pink {
+    fill: var(--t-pink);
+}
+
+.rt-tulip-purple {
+    fill: var(--t-purple);
+}
+
+.rt-tulip-orange {
+    fill: var(--t-orange);
+}
+
+.rt-leaf {
+    fill: var(--foliage);
+}
+
+.rt-rows {
+    fill: none;
+    stroke: rgba(0, 0, 0, 0.22);
+    stroke-width: 2.8;
+    stroke-dasharray: 0.7 1.9;
+}
+
+@keyframes rt-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* The yard */
+.rt-wall {
+    fill: var(--wall);
+}
+
+.rt-wall-dark {
+    fill: var(--wall-dark);
+}
+
+.rt-roof {
+    fill: var(--roof);
+}
+
+.rt-win {
+    fill: var(--win);
+    stroke: rgba(0, 0, 0, 0.25);
+    stroke-width: 0.5;
+}
+
+.rt-brick {
+    fill: var(--brick);
+}
+
+.rt-brick-cap {
+    fill: var(--steel);
+}
+
+.rt-door {
+    fill: #23262c;
+}
+
+.rt-door-glow {
+    fill: #ffcf6b;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.roadtrip.working .rt-door-glow {
+    opacity: 0.55;
+}
+
+.roadtrip.working .rt-smoke circle {
+    animation-duration: 2.6s;
+}
+
+.rt-door-slats {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.18);
+    stroke-width: 0.6;
+}
+
+.rt-smoke circle {
+    fill: var(--smoke);
+    opacity: 0;
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: rt-smoke 6s linear infinite;
+}
+
+@keyframes rt-smoke {
+    0% {
+        opacity: 0;
+        transform: translate(0, 0) scale(0.5);
+    }
+    15% {
+        opacity: 0.6;
+    }
+    100% {
+        opacity: 0;
+        transform: translate(16px, -36px) scale(2.4);
+    }
+}
+
+.rt-crane,
+.rt-crane-cab {
+    fill: var(--crane);
+}
+
+.rt-crane-cab {
+    filter: brightness(0.85);
+}
+
+.rt-crane-window {
+    fill: #bcd9ea;
+}
+
+.rt-crane-leg {
+    fill: none;
+    stroke: var(--crane);
+    stroke-width: 3.2;
+    stroke-linejoin: round;
+}
+
+.rt-crane-truss {
+    fill: none;
+    stroke: var(--crane);
+    stroke-width: 0.9;
+}
+
+.rt-beacon {
+    fill: #ff3b30;
+    animation: rt-blink 1.4s steps(1) infinite;
+}
+
+@keyframes rt-blink {
+    50% {
+        opacity: 0.15;
+    }
+}
+
+.rt-trolley,
+.rt-spreader {
+    fill: var(--steel);
+}
+
+.rt-cable {
+    fill: none;
+    stroke: var(--steel);
+    stroke-width: 0.8;
+}
+
+/* The container that is moved around: PHP in, Python out. */
+.rt-ctr {
+    fill: #6a6fae;
+}
+
+.rt-dyn[data-kind="python"] .rt-ctr {
+    fill: #2f6da3;
+}
+
+.rt-dyn[data-kind="php"] .k-python,
+.rt-dyn[data-kind="python"] .k-php {
+    display: none;
+}
+
+.rt-ctr-label {
+    font: 800 11px "Helvetica Neue", Arial, sans-serif;
+    fill: #fff;
+}
+
+.rt-dyn[data-kind="python"] .rt-ctr-label {
+    fill: #ffd43b;
+}
+
+.rt-ctr-ribs {
+    fill: none;
+    stroke: rgba(0, 0, 0, 0.17);
+    stroke-width: 0.5;
+}
+
+.rt-ctr-rail {
+    fill: rgba(0, 0, 0, 0.22);
+}
+
+.rt-ctr-corner {
+    fill: #2b2f36;
+}
+
+.rt-trailer .truck-frame,
+.rt-tractor .truck-frame {
+    fill: var(--frame);
+}
+
+.rt-tractor .truck-fender {
+    fill: #2a2c31;
+}
+
+/* The trailer's landing gear is down while it is parked and goes up when the tractor has coupled. */
+.trailer-leg {
+    transition: transform 1s ease;
+}
+
+.rt-trailer.parked .trailer-leg {
+    transform: translateY(4.1px);
+}
+
+.rt-tractor {
+    cursor: pointer;
+    pointer-events: all;
+    outline: none;
+}
+
+.rt-tractor:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+}
+
+/* Amber lamp flashes while the tractor reverses. */
+.rt-tractor.reversing .truck-light-amber {
+    animation: rt-amber 0.9s steps(1) infinite;
+}
+
+@keyframes rt-amber {
+    50% {
+        fill-opacity: 0.2;
+    }
+}
+
+/* The beam and lamps at dusk and night (the lane is a .truck-lane, so the footer truck's rules apply to the beam). */
+.roadtrip[data-phase="dusk"] .rt-tractor .truck-headlight,
+.roadtrip[data-phase="night"] .rt-tractor .truck-headlight {
+    fill: #fffbe0;
+}
+
+@media only screen and (max-width: 700px) {
+    .roadtrip {
+        margin-top: 0.6em;
+    }
+
+    .rt-top {
+        padding-bottom: 3em; /* the About card is shifted down a little on phones */
+    }
+
+    .roadtrip-lane {
+        flex: 0 0 auto;
+        height: 215px;
+    }
+
+    .rt-sun {
+        left: 4%;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .rt-cloud,
+    .rt-blades,
+    .rt-rotor,
+    .rt-smoke circle,
+    .rt-beacon,
+    .rt-plane,
+    .rt-birds,
+    .rt-plane-light {
+        animation: none;
+    }
+
+    .trailer-leg,
+    .rt-stage {
+        transition: none;
+    }
+}
+
+/* About page: the scene runs up behind the navbar, which keeps its solid red look. */
+.page--scene > nav {
+    position: relative;
+    z-index: 20;
+}
+
+.page--scene > nav ul {
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22);
+}
+
+/* The navbar block is 78px tall (15px margins and a 48px bar): the scene starts at the very top of the page. */
+.page--scene .roadtrip {
+    margin-top: -78px;
+    padding-top: 78px;
 }

@@ -1,10 +1,12 @@
 import aboutImg from "../images/about-me.jpeg"
 import React from "react";
 import Seo, {PERSON, SITE_URL} from "../components/Seo";
+import RoadTrip from "../components/RoadTrip";
 
 class About extends React.Component {
     render() {
         return (
+            <RoadTrip>
             <div id="about" className="about">
                 <Seo
                     title="Kamran Azari - About Me"
@@ -29,6 +31,7 @@ class About extends React.Component {
                     rel="nofollow noreferrer">(کامیون)</a>, and I'm a big fan of Trucks! 🚚
                 </p>
             </div>
+            </RoadTrip>
         )
     }
 };
